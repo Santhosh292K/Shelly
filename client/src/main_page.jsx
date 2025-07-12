@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import WalmartSignIn from './registration_page';
 import shelly_img from './assets/shelly_img.jpg'
 
-// Walmart Logo Component using local image
+// Walmart Logo Component using local images
 const WalmartLogo = ({ size = 56 }) => (
   <div className=" flex items-center justify-center" style={{ width: size, height: size }}>
     <img 
