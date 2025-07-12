@@ -1,14 +1,45 @@
-import './index.css'
+import './index.css';
+import { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import RegistrationPage from './registration_page';
+import WalmartMobileApp from './main_page';
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   return (
-    <div className="min-h-screen bg-white p-10 space-y-4">
-      <div className="text-red-300 text-xl font-bold">Red 300 (should be light red)</div>
-      <div className="text-red-600 text-xl font-bold">Red 600 (should be visible red)</div>
-      <div className="text-blue-500 text-xl font-bold">Blue 500 (should be visible blue)</div>
-      <div className="!text-green-500 text-xl font-bold">Green 500 with !important</div>
-    </div>
+    <BrowserRouter>
+      <div className="min-h-screen flex justify-center items-center bg-gray-100">
+        <div className="border border-gray-300 shadow-lg" style={{ width: '375px', height: '667px' }}>
+          <Routes>
+            <Route
+              path="/registration"
+              element={
+                isAuthenticated ? (
+                  <Navigate to="/app" />
+                ) : (
+                  <RegistrationPage onComplete={() => setIsAuthenticated(true)} />
+                )
+              }
+            />
+            <Route
+              path="/app"
+              element={
+                isAuthenticated ? (
+                  <WalmartMobileApp onSignOut={() => setIsAuthenticated(false)} />
+                ) : (
+                  <Navigate to="/registration" />
+                )
+              }
+            />
+            <Route
+              path="*"
+              element={<Navigate to={isAuthenticated ? "/app" : "/registration"} />}
+            />
+          </Routes>
+        </div>
+      </div>
+    </BrowserRouter>
   );
 }
 
-  
