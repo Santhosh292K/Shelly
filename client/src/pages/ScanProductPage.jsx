@@ -1,7 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Leaf, ShoppingCart, AlertCircle, Recycle, TrendingDown, Star, Receipt } from 'lucide-react';
+import React, { useState, useRef, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Camera, Leaf, ShoppingCart, AlertCircle, Recycle, TrendingDown, Star, Receipt, ArrowLeft } from 'lucide-react';
 
 const ScanProduct = () => {
+  const navigate = useNavigate();
   const [isScanning, setIsScanning] = useState(false);
   const [scannedCode, setScannedCode] = useState('');
   const [productData, setProductData] = useState(null);
@@ -100,7 +102,6 @@ const ScanProduct = () => {
       greenAlternatives: []
     }
   };
-
   // Start camera for scanning
   const startScanning = async () => {
     try {
@@ -299,12 +300,16 @@ const ScanProduct = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
         {/* Header */}
-        <div className="bg-white shadow-sm px-6 py-4">
+        <div className="bg-blue-600 px-6 py-4">
           <div className="flex items-center gap-3">
-            <Leaf className="text-green-600" size={24} />
+            <button
+              onClick={() => navigate(-1)}
+              className="text-white hover:text-blue-100 transition-colors"
+            >
+              <ArrowLeft size={24} />
+            </button>
             <div>
-              <h1 className="text-xl font-semibold text-gray-800">EcoScan</h1>
-              <p className="text-sm text-gray-600">Scan & organize your products</p>
+              <h1 className="text-xl font-semibold text-white">Scan Products</h1>
             </div>
           </div>
         </div>
@@ -513,19 +518,17 @@ const ScanProduct = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm px-6 py-4">
+      <div className="bg-blue-600 px-6 py-4">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => {
-              setProductData(null);
-              setScannedCode('');
-            }}
-            className="text-blue-600 hover:text-blue-700"
+            onClick={() => navigate(-1)}
+            className="text-white hover:text-blue-100 transition-colors"
           >
-            ← Back
+            <ArrowLeft size={24} />
           </button>
           <div>
-            <h1 className="text-xl font-semibold text-gray-800">Product Details</h1>
+            <h1 className="text-xl font-semibold text-white">Product Details</h1>
+            <p className="text-sm text-blue-100">Carbon footprint analysis</p>
           </div>
         </div>
       </div>
