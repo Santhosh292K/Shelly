@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Heart, ShoppingCart, AlertCircle, Utensils, Home, Baby, Gamepad2, Car, Dumbbell, Palette, Book, Music, Shirt, Pill, Apple, Wheat, Milk, Fish, Egg, TreePine, Sparkles, Target, Clock, DollarSign, Star, Check, Leaf, CircleOff } from 'lucide-react';
+import { Heart, ShoppingCart, AlertCircle, Utensils, Home, Baby, Gamepad2, Car, Dumbbell, Palette, Book, Music, Shirt, Pill, Apple, Wheat, Milk, Fish, Egg, TreePine, Sparkles, Target, Clock, DollarSign, Star, Check, Leaf, LeafyGreen, CableCar, LeafIcon, LeafyGreenIcon, Vegan, VeganIcon, SaladIcon, CarrotIcon, EggIcon, CircleOff, AppleIcon, NutIcon, ShrimpIcon, BeanIcon, TreesIcon } from 'lucide-react';
+import walmartLogo from './assets/walmart_logo.png';
+
 
 const PersonalizationPage = () => {
   const [formData, setFormData] = useState({
@@ -31,38 +33,17 @@ const PersonalizationPage = () => {
     }));
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
-
   const nextStep = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-      scrollToTop();
-    }
+    if (currentStep < totalSteps) setCurrentStep(currentStep + 1);
   };
 
   const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-      scrollToTop();
-    }
+    if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
   const handleSubmit = () => {
     console.log('Personalization data:', formData);
     alert('Welcome to Walmart! Your personalized shopping experience is ready.');
-    scrollToTop();
   };
 
   const ProgressBar = () => (
@@ -115,25 +96,25 @@ const PersonalizationPage = () => {
     switch (currentStep) {
       case 1:
         const dietaryOptions = [
-          { name: 'Vegetarian', icon: Leaf },
-          { name: 'Vegan', icon: Leaf },
-          { name: 'Keto', icon: Apple },
+          { name: 'Vegetarian', icon: Vegan },
+          { name: 'Vegan', icon: VeganIcon },
+          { name: 'Keto', icon: AppleIcon },
           { name: 'Paleo', icon: Fish },
           { name: 'Gluten-Free', icon: Wheat },
-          { name: 'Low-Carb', icon: Apple },
+          { name: 'Low-Carb', icon: SaladIcon },
           { name: 'High-Protein', icon: Egg },
-          { name: 'Organic', icon: Leaf },
+          { name: 'Organic', icon: CarrotIcon },
           { name: 'No Preferences', icon: CircleOff}
         ];
 
         const allergyOptions = [
-          { name: 'Nuts', icon: Apple },
+          { name: 'Nuts', icon: NutIcon },
           { name: 'Dairy', icon: Milk },
           { name: 'Gluten', icon: Wheat },
           { name: 'Eggs', icon: Egg },
           { name: 'Fish', icon: Fish },
-          { name: 'Shellfish', icon: Fish },
-          { name: 'Soy', icon: Leaf},
+          { name: 'Shellfish', icon: ShrimpIcon },
+          { name: 'Soy', icon: BeanIcon},
           { name: 'No Allergies', icon: CircleOff }
         ];
 
@@ -188,7 +169,7 @@ const PersonalizationPage = () => {
           { name: 'Tech Enthusiast', icon: Gamepad2 },
           { name: 'Fitness Focused', icon: Dumbbell },
           { name: 'Home Chef', icon: Utensils },
-          { name: 'Eco-Friendly', icon: TreePine },
+          { name: 'Eco-Friendly', icon: TreesIcon },
           { name: 'Style Conscious', icon: Sparkles }
         ];
 
@@ -320,12 +301,12 @@ const PersonalizationPage = () => {
         {/* Header */}
         <div className="text-center mb-10 sm:mb-12">
           <div className="inline-flex items-center space-x-3 mb-6">
-            <div className="max-w-xl mr-9 mb-1 flex items-center space-x-0 ">
-              <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">W</span>
-              </div>
-              <h1 className="text-3xl sm:text-5xl font-bold text-blue-700">Walmart</h1>
-            </div>
+        <div className="max-w-xl mr-9 mb-1 flex items-center space-x-0 ">
+  <img src={walmartLogo} alt="Walmart Logo" className="w-20 h-20 object-contain" />
+  <h1 className="text-3xl sm:text-5xl font-bold text-blue-700">Walmart</h1>
+</div>
+          
+            
           </div>
           <h2 className="text-xl sm:text-3xl text-gray-700 mb-3 font-semibold">Let's personalize your experience</h2>
           <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">

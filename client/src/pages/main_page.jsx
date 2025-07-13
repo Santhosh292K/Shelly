@@ -5,11 +5,11 @@ import { Receipt } from 'lucide-react';
 import { Palette } from 'lucide-react';
 import { HelpCircle } from 'lucide-react';
 import { Tag, BadgePercent, Gift } from 'lucide-react';
-import walmartLogo from './assets/walmart_logo.png';
+import walmartLogo from '../assets/walmart_logo.png';
 import { useNavigate } from 'react-router-dom';
 import WalmartSignIn from './registration_page';
-import shelly_img from './assets/shelly_img.jpg';
-import shelly_wave from './assets/shelly_wave.webm';
+import shelly_img from '../assets/shelly_img.jpg';
+import shelly_wave from '../assets/shelly_wave.webm';
 
 // Shelly AI Assistant Component
 const ShellyAssistant = () => {
