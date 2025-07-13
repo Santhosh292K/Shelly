@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu, Search, Mic, Keyboard, Home, User, Settings, ScanLine, Leaf, Send, ArrowLeft } from 'lucide-react';
 import { QrCode } from 'lucide-react';
 import { Receipt } from 'lucide-react';
@@ -8,7 +8,306 @@ import { Tag, BadgePercent, Gift } from 'lucide-react';
 import walmartLogo from './assets/walmart_logo.png';
 import { useNavigate } from 'react-router-dom';
 import WalmartSignIn from './registration_page';
-import shelly_img from './assets/shelly_img.jpg'
+import shelly_img from './assets/shelly_img.jpg';
+import shelly_wave from './assets/shelly_wave.webm';
+
+// Shelly AI Assistant Component
+const ShellyAssistant = () => {
+  const [showDialog, setShowDialog] = useState(true);
+  const [currentMessage, setCurrentMessage] = useState(0);
+  
+  const welcomeMessages = [
+    "Hi there! I'm Shelly, your shopping assistant!",
+    "Welcome to Walmart! How can I help you today?",
+    "Ask me anything about products, deals, or your shopping needs!"
+  ];
+
+  useEffect(() => {
+    // Auto-cycle through welcome messages
+    const interval = setInterval(() => {
+      setCurrentMessage((prev) => (prev + 1) % welcomeMessages.length);
+    }, 4000);
+
+    // Hide dialog after 12 seconds
+    const hideTimer = setTimeout(() => {
+      setShowDialog(false);
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(hideTimer);
+    };
+  }, []);
+
+  const handleVideoClick = () => {
+    setShowDialog(true);
+    setCurrentMessage(0);
+  };
+
+  return (
+    <div className="w-full h-full flex flex-col justify-center items-center">
+      {/* Dialog Box - positioned above Shelly */}
+      {showDialog && (
+        <div className="relative mb-0 transform transition-all duration-500 ease-out">
+          {/* Speech bubble */}
+          <div className="bg-gradient-to-br from-blue-50 to-white rounded-3xl px-6 py-5 shadow-2xl border-2 border-blue-200 max-w-xs mx-auto relative animate-bounce-in">
+            {/* Speech bubble tail pointing down */}
+            <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-2 h-6 bg-gradient-to-br from-blue-50 to-white border-r-2 border-b-2 border-blue-200 rotate-45"></div>
+            
+            {/* Message content */}
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-0">
+                <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-green-500 rounded-full mr-2 animate-pulse shadow-lg"></div>
+                <span className="text-sm font-bold text-blue-600 uppercase tracking-wide">Shelly Says</span>
+              </div>
+              
+              <p className="text-base text-gray-700 leading-relaxed font-semibold mb-2">
+                {welcomeMessages[currentMessage]}
+              </p>
+              
+              {/* Fun interactive elements */}
+              <div className="flex justify-center items-center space-x-4 mb-3">
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                  <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                  <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                </div>
+                <div className="text-2xl animate-bounce">🛒</div>
+              </div>
+              
+              {/* Progress indicator */}
+              <div className="flex justify-center space-x-1 mb-2">
+               
+              </div>
+            </div>
+            
+            {/* Close button */}
+            <button
+              onClick={() => setShowDialog(false)}
+              className="absolute -top-2 -right-2 w-6 h-6 bg-red-400 hover:bg-red-500 rounded-full flex items-center justify-center text-white text-sm font-bold transition-all duration-200 shadow-lg hover:scale-110"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Shelly Video */}
+      <div 
+        className="relative cursor-pointer transform hover:scale-105 transition-transform duration-300"
+        onClick={handleVideoClick}
+      >
+        <video
+          src={shelly_wave}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-auto scale-150 mt-12"
+        />
+        
+       
+      </div>
+
+      {/* Floating particles around Shelly */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute w-3 h-3 bg-blue-400 rounded-full opacity-60 animate-float-1" style={{top: '10%', left: '10%'}}></div>
+        <div className="absolute w-2 h-2 bg-green-400 rounded-full opacity-60 animate-float-2" style={{top: '20%', right: '15%'}}></div>
+        <div className="absolute w-4 h-4 bg-yellow-400 rounded-full opacity-60 animate-float-3" style={{bottom: '15%', left: '20%'}}></div>
+        <div className="absolute w-2 h-2 bg-purple-400 rounded-full opacity-60 animate-float-4" style={{bottom: '10%', right: '10%'}}></div>
+      </div>
+
+      {/* Additional CSS for animations */}
+      <style>{`
+        @keyframes bounce-in {
+          0% { 
+            transform: scale(0.3) translateY(-20px); 
+            opacity: 0; 
+          }
+          50% { 
+            transform: scale(1.05) translateY(-10px); 
+            opacity: 0.8; 
+          }
+          100% { 
+            transform: scale(1) translateY(0); 
+            opacity: 1; 
+          }
+        }
+        
+        @keyframes float-1 {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          25% { transform: translateY(-20px) translateX(10px); }
+          50% { transform: translateY(-10px) translateX(20px); }
+          75% { transform: translateY(-15px) translateX(5px); }
+        }
+        
+        @keyframes float-2 {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          33% { transform: translateY(-15px) translateX(-10px); }
+          66% { transform: translateY(-5px) translateX(-20px); }
+        }
+        
+        @keyframes float-3 {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          50% { transform: translateY(15px) translateX(-15px); }
+        }
+        
+        @keyframes float-4 {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          25% { transform: translateY(10px) translateX(10px); }
+          75% { transform: translateY(5px) translateX(-5px); }
+        }
+        
+        .animate-bounce-in {
+          animation: bounce-in 0.6s ease-out;
+        }
+        
+        .animate-float-1 {
+          animation: float-1 6s ease-in-out infinite;
+        }
+        
+        .animate-float-2 {
+          animation: float-2 8s ease-in-out infinite 1s;
+        }
+        
+        .animate-float-3 {
+          animation: float-3 7s ease-in-out infinite 2s;
+        }
+        
+        .animate-float-4 {
+          animation: float-4 9s ease-in-out infinite 0.5s;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+// Updated MainPage Component
+const MainPage = ({ messageText, setMessageText, isRecording, handleVoiceToggle, handleSendMessage }) => (
+  <div className="flex-1 bg-white relative flex flex-col justify-end">
+    <FloatingSpheresBackground />
+    
+    {/* Shelly AI Assistant - positioned in center above input */}
+    <ShellyAssistant />
+    
+    {/* Input area - moved to bottom */}
+    <div className="flex justify-center items-center gap-3 p-12 bg-transparent z-10">
+      <div className="flex items-center gap-2 flex-1 bg-white bg-opacity-95 rounded-3xl p-2 shadow-lg backdrop-blur-sm border border-white border-opacity-20">
+        <input
+          type="text"
+          value={messageText}
+          onChange={(e) => setMessageText(e.target.value)}
+          placeholder="Ask Shelly anything..."
+          className="flex-1 py-2 px-3 border-none rounded-2xl text-sm bg-gray-100 bg-opacity-80 text-gray-800 outline-none"
+        />
+        <button 
+          className={`w-8 h-8 rounded-full border-none cursor-pointer flex items-center justify-center shadow-md ${
+            messageText.trim() 
+              ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white' 
+              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+          }`}
+          onClick={handleSendMessage}
+          disabled={!messageText.trim()}
+        >
+          <Send size={16} />
+        </button>
+      </div>
+      
+      <div className="flex items-center justify-center">
+        <button 
+          className={`w-11 h-11 rounded-full border-none cursor-pointer flex items-center justify-center shadow-md ${
+            isRecording ? 'bg-red-500 animate-pulse' : 'bg-yellow-400'
+          } text-white`}
+          onClick={handleVoiceToggle}
+        >
+          <Mic size={20} />
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+// Floating Spheres Background Component (unchanged)
+const FloatingSpheresBackground = () => {
+  return (
+    <div className="absolute inset-0 w-full h-full overflow-hidden bg-white">
+      {/* Main fluid wave shape */}
+      <div className="absolute top-1/4 -left-4 bg-blue-200 opacity-80 animate-pulse" style={{
+        borderRadius: '50% 50% 60% 40% / 25% 35% 65% 75%',
+        width: '110%',
+        height: '45%',
+        animation: 'slowDrift 25s ease-in-out infinite'
+      }}></div>
+      
+      {/* Floating spheres */}
+      <div className="absolute w-11 h-11 bg-white rounded-full opacity-90 animate-bounce" style={{
+        top: '45%', left: '5%', animation: 'floatUp 7s ease-in-out infinite'
+      }}></div>
+      <div className="absolute w-9 h-9 bg-blue-200 rounded-full opacity-90" style={{
+        top: '16%', right: '25%', animation: 'floatDown 8s ease-in-out infinite 1s'
+      }}></div>
+      <div className="absolute w-6 h-6 bg-blue-200 rounded-full opacity-90" style={{
+        top: '14%', left: '45%', animation: 'gentleFloat 6s ease-in-out infinite 2s'
+      }}></div>
+      <div className="absolute w-14 h-14 bg-white rounded-full opacity-90" style={{
+        top: '30%', right: '10%', animation: 'floatSide 9s ease-in-out infinite 0.5s'
+      }}></div>
+      <div className="absolute w-8 h-8 bg-white rounded-full opacity-90" style={{
+        top: '28%', left: '20%', animation: 'floatUp 8s ease-in-out infinite 3s'
+      }}></div>
+      <div className="absolute w-5 h-5 bg-blue-200 rounded-full opacity-90" style={{
+        top: '12%', right: '5%', animation: 'floatDown 5s ease-in-out infinite 1.5s'
+      }}></div>
+      <div className="absolute w-16 h-16 bg-white rounded-full opacity-90" style={{
+        top: '55%', left: '55%', animation: 'gentleFloat 10s ease-in-out infinite 2.5s'
+      }}></div>
+      <div className="absolute w-5 h-5 bg-blue-200 rounded-full opacity-90" style={{
+        top: '72%', left: '20%', animation: 'floatSide 6s ease-in-out infinite 1s'
+      }}></div>
+      <div className="absolute w-8 h-8 bg-blue-200 rounded-full opacity-90" style={{
+        top: '70%', right: '15%', animation: 'floatUp 7s ease-in-out infinite 4s'
+      }}></div>
+      <div className="absolute w-6 h-6 bg-blue-200 rounded-full opacity-90" style={{
+        top: '74%', left: '60%', animation: 'floatDown 4s ease-in-out infinite 0.8s'
+      }}></div>
+      
+      {/* CSS animations */}
+      <style>{`
+        @keyframes floatUp {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes floatDown {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(12px); }
+        }
+        
+        @keyframes floatSide {
+          0%, 100% { transform: translateX(0px) translateY(0px); }
+          25% { transform: translateX(8px) translateY(-8px); }
+          75% { transform: translateX(-8px) translateY(8px); }
+        }
+        
+        @keyframes gentleFloat {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes slowDrift {
+          0%, 100% { transform: translateX(0px) translateY(0px); }
+          33% { transform: translateX(15px) translateY(-8px); }
+          66% { transform: translateX(-10px) translateY(10px); }
+        }
+        
+        @keyframes buttonPulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+        }
+      `}</style>
+    </div>
+  );
+};
 
 // Walmart Logo Component using local images
 const WalmartLogo = ({ size = 56 }) => (
@@ -220,128 +519,7 @@ const HamburgerMenu = ({ isOpen, onClose, onNavigate, onSignOut }) => {
   );
 };
 
-// Floating Spheres Background Component
-const FloatingSpheresBackground = () => {
-  return (
-    <div className="absolute inset-0 w-full h-full overflow-hidden bg-white">
-      {/* Main fluid wave shape */}
-      <div className="absolute top-1/4 -left-4 bg-blue-200 opacity-80 animate-pulse" style={{
-        borderRadius: '50% 50% 60% 40% / 25% 35% 65% 75%',
-        width: '110%',
-        height: '45%',
-        animation: 'slowDrift 25s ease-in-out infinite'
-      }}></div>
-      
-      {/* Floating spheres */}
-      <div className="absolute w-11 h-11 bg-white rounded-full opacity-90 animate-bounce" style={{
-        top: '45%', left: '5%', animation: 'floatUp 7s ease-in-out infinite'
-      }}></div>
-      <div className="absolute w-9 h-9 bg-blue-200 rounded-full opacity-90" style={{
-        top: '16%', right: '25%', animation: 'floatDown 8s ease-in-out infinite 1s'
-      }}></div>
-      <div className="absolute w-6 h-6 bg-blue-200 rounded-full opacity-90" style={{
-        top: '14%', left: '45%', animation: 'gentleFloat 6s ease-in-out infinite 2s'
-      }}></div>
-      <div className="absolute w-14 h-14 bg-white rounded-full opacity-90" style={{
-        top: '30%', right: '10%', animation: 'floatSide 9s ease-in-out infinite 0.5s'
-      }}></div>
-      <div className="absolute w-8 h-8 bg-white rounded-full opacity-90" style={{
-        top: '28%', left: '20%', animation: 'floatUp 8s ease-in-out infinite 3s'
-      }}></div>
-      <div className="absolute w-5 h-5 bg-blue-200 rounded-full opacity-90" style={{
-        top: '12%', right: '5%', animation: 'floatDown 5s ease-in-out infinite 1.5s'
-      }}></div>
-      <div className="absolute w-16 h-16 bg-white rounded-full opacity-90" style={{
-        top: '55%', left: '55%', animation: 'gentleFloat 10s ease-in-out infinite 2.5s'
-      }}></div>
-      <div className="absolute w-5 h-5 bg-blue-200 rounded-full opacity-90" style={{
-        top: '72%', left: '20%', animation: 'floatSide 6s ease-in-out infinite 1s'
-      }}></div>
-      <div className="absolute w-8 h-8 bg-blue-200 rounded-full opacity-90" style={{
-        top: '70%', right: '15%', animation: 'floatUp 7s ease-in-out infinite 4s'
-      }}></div>
-      <div className="absolute w-6 h-6 bg-blue-200 rounded-full opacity-90" style={{
-        top: '74%', left: '60%', animation: 'floatDown 4s ease-in-out infinite 0.8s'
-      }}></div>
-      
-      {/* CSS animations */}
-      <style>{`
-        @keyframes floatUp {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-15px); }
-        }
-        
-        @keyframes floatDown {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(12px); }
-        }
-        
-        @keyframes floatSide {
-          0%, 100% { transform: translateX(0px) translateY(0px); }
-          25% { transform: translateX(8px) translateY(-8px); }
-          75% { transform: translateX(-8px) translateY(8px); }
-        }
-        
-        @keyframes gentleFloat {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-        
-        @keyframes slowDrift {
-          0%, 100% { transform: translateX(0px) translateY(0px); }
-          33% { transform: translateX(15px) translateY(-8px); }
-          66% { transform: translateX(-10px) translateY(10px); }
-        }
-        
-        @keyframes buttonPulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.1); }
-        }
-      `}</style>
-    </div>
-  );
-};
-
-// Page Components
-const MainPage = ({ messageText, setMessageText, isRecording, handleVoiceToggle, handleSendMessage }) => (
-  <div className="flex-1 bg-white relative flex flex-col justify-end">
-    <FloatingSpheresBackground />
-    <div className="flex justify-center items-center gap-3 p-12 bg-transparent z-10">
-      <div className="flex items-center gap-2 flex-1 bg-white bg-opacity-95 rounded-3xl p-2 shadow-lg backdrop-blur-sm border border-white border-opacity-20">
-        <input
-          type="text"
-          value={messageText}
-          onChange={(e) => setMessageText(e.target.value)}
-          placeholder="Talk to me..."
-          className="flex-1 py-2 px-3 border-none rounded-2xl text-sm bg-gray-100 bg-opacity-80 text-gray-800 outline-none"
-        />
-        <button 
-          className={`w-8 h-8 rounded-full border-none cursor-pointer flex items-center justify-center shadow-md ${
-            messageText.trim() 
-              ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white' 
-              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-          }`}
-          onClick={handleSendMessage}
-          disabled={!messageText.trim()}
-        >
-          <Send size={16} />
-        </button>
-      </div>
-      
-      <div className="flex items-center justify-center">
-        <button 
-          className={`w-11 h-11 rounded-full border-none cursor-pointer flex items-center justify-center shadow-md ${
-            isRecording ? 'bg-red-500 animate-pulse' : 'bg-yellow-400'
-          } text-white`}
-          onClick={handleVoiceToggle}
-        >
-          <Mic size={20} />
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
+// Generic Page Component
 const GenericPage = ({ title, onBack }) => (
   <div className="flex-1 bg-gray-50 flex flex-col">
     <div className="bg-white border-b border-gray-200 p-4 flex items-center">
@@ -362,6 +540,7 @@ const GenericPage = ({ title, onBack }) => (
   </div>
 );
 
+// Main App Component
 function WalmartMobileApp({onSignOut}) {
   const [currentPage, setCurrentPage] = useState('main');
   const [messageText, setMessageText] = useState('');
@@ -380,12 +559,10 @@ function WalmartMobileApp({onSignOut}) {
   };
 
   const handleConfirmSignOut = () => {
-  setShowConfirmModal(false);
-  setIsMenuOpen(false);
-  onSignOut(); 
-};
-
-
+    setShowConfirmModal(false);
+    setIsMenuOpen(false);
+    onSignOut(); 
+  };
 
   const handleCancelSignOut = () => {
     setShowConfirmModal(false);
@@ -436,7 +613,6 @@ function WalmartMobileApp({onSignOut}) {
 
   return (
     <div className="w-full h-screen bg-white flex flex-col relative font-sans">
-
       {/* Top Navigation Bar */}
       <TopNavigation 
         onMenuToggle={handleMenuToggle} 
