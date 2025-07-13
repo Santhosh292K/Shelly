@@ -11,12 +11,15 @@ import WalmartSignIn from './registration_page';
 import shelly_img from '../assets/shelly_img.jpg';
 import shelly_wave from '../assets/shelly_wave.webm';
 import shelly_listens from '../assets/shelly_listens.webm'
+import shelly_rotate from '../assets/shelly_rotate.webm'
 
 
 // Shelly AI Assistant Component
 const ShellyAssistant = ({ isRecording }) => {
   const [showDialog, setShowDialog] = useState(true);
   const [currentMessage, setCurrentMessage] = useState(0);
+  const [currentVideo, setCurrentVideo] = useState('wave');
+  const [videoIndex, setVideoIndex] = useState(0);
   
   const welcomeMessages = [
     "Hi there! I'm Shelly, your shopping assistant!",
@@ -26,15 +29,20 @@ const ShellyAssistant = ({ isRecording }) => {
   
   // Updated to show listening message when recording
   const displayMessage = isRecording ? "I'm listening..." : welcomeMessages[currentMessage];
+  
+  const videoPattern = ['wave', 'wave', 'rotate'];
 
   useEffect(() => {
-    // Only cycle through messages when NOT recording
     if (!isRecording) {
-      const interval = setInterval(() => {
-        setCurrentMessage((prev) => (prev + 1) % welcomeMessages.length);
-      }, 4000);
+      const videoInterval = setInterval(() => {
+        setVideoIndex(prevIndex => {
+          const nextIndex = (prevIndex + 1) % videoPattern.length;
+          setCurrentVideo(videoPattern[nextIndex]);
+          return nextIndex;
+        });
+      }, 2500); // Change every 8 seconds
 
-      return () => clearInterval(interval);
+      return () => clearInterval(videoInterval);
     }
   }, [isRecording]);
 
@@ -55,6 +63,12 @@ const ShellyAssistant = ({ isRecording }) => {
   const handleVideoClick = () => {
     setShowDialog(true);
     setCurrentMessage(0);
+  };
+  const getVideoSource = () => {
+    if (isRecording) {
+      return shelly_listens;
+    }
+    return currentVideo === 'wave' ? shelly_wave : shelly_rotate;
   };
 
   return (
@@ -108,8 +122,8 @@ const ShellyAssistant = ({ isRecording }) => {
         onClick={handleVideoClick}
       >
         <video
-          key={isRecording ? 'listening' : 'waving'} // Force re-render when switching videos
-          src={isRecording ? shelly_listens : shelly_wave}
+          key={isRecording ? 'listening' : currentVideo} // Updated key
+          src={getVideoSource()} // Updated src
           autoPlay
           loop
           muted
