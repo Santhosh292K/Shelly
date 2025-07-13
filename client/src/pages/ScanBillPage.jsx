@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Camera, Scan, ShoppingCart, Calendar, DollarSign, Store, Trash2, Eye, X, Plus, Receipt, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+import { Camera, Scan, ShoppingCart, Calendar, DollarSign, Store, Trash2, Eye, X, Plus, Receipt, ChevronRight, ArrowLeft } from 'lucide-react';
 
 const ScanBill = () => {
+  const navigate = useNavigate();
   const [isScanning, setIsScanning] = useState(false);
   const [bills, setBills] = useState([]);
   const [selectedBill, setSelectedBill] = useState(null);
@@ -97,18 +100,24 @@ const ScanBill = () => {
     });
   };
 
+  const handleBackClick = () => {
+    navigate(-1);
+
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
+      {/* App Bar */}
+      <div className="bg-blue-600 text-white sticky top-0 z-50 shadow-lg">
         <div className="px-4 py-3">
           <div className="flex items-center">
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Bill Scanner
-              </h1>
-              <p className="text-gray-600 text-xs mt-1">Scan & organize your receipts</p>
-            </div>
+            <button
+              onClick={handleBackClick}
+              className="p-2 -ml-2 mr-3 rounded-full hover:bg-blue-700 transition-colors"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+            <h1 className="text-xl font-semibold">Upload your bills</h1>
           </div>
         </div>
       </div>
@@ -365,4 +374,4 @@ const ScanBill = () => {
   );
 };
 
-export default ScanBill; 
+export default ScanBill;
