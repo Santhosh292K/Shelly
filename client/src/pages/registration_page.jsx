@@ -24,7 +24,8 @@ function WalmartSignIn({ onComplete }) {
 
   const handleSubmit = () => {
     console.log('Form submitted:', formData);
-    onComplete && onComplete();
+    // Pass whether it's a sign-up or sign-in to the parent component
+    onComplete && onComplete(isSignUp);
   };
 
   const handleInputFocus = (name) => setFocusedInput(name);
