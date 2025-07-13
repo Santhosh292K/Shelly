@@ -3,7 +3,7 @@ import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import walmartLogo from './assets/walmart_logo.png';
 import googleLogo from './assets/google_logo.png';
 
-//Sign In / Sign Up Component
+// ✅ Sign In / Sign Up Component
 function WalmartSignIn({ onComplete }) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -32,8 +32,13 @@ function WalmartSignIn({ onComplete }) {
 
   return (
     
-    <div className="bg-blue-50 relative overflow-hidden" style={{ width: '365px', height: '667px' }}>
-      
+    <div className="bg-blue-50 w-full h-full relative overflow-hidden">
+      {/* Decorative Background Bubbles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        
+       
+      </div>
+
       {/* Scrollable Content Container */}
       <div className="relative z-10 h-full overflow-y-auto">
         <div className="px-4 py-4 min-h-full flex flex-col">

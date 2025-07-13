@@ -435,10 +435,8 @@ function WalmartMobileApp({onSignOut}) {
   };
 
   return (
-    <div className="w-full h-full bg-white flex flex-col relative font-sans" style={{
-      width: '375px',
-      height: '667px'
-    }}>
+    <div className="w-full h-screen bg-white flex flex-col relative font-sans">
+
       {/* Top Navigation Bar */}
       <TopNavigation 
         onMenuToggle={handleMenuToggle} 

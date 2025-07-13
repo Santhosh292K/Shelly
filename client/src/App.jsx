@@ -1,4 +1,3 @@
-import './index.css';
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import RegistrationPage from './registration_page';
@@ -9,8 +8,10 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      {/* Centered full-screen background */}
       <div className="min-h-screen flex justify-center items-center bg-gray-100">
-        <div className="border border-gray-300 shadow-lg" style={{ width: '375px', height: '667px' }}>
+        {/* Responsive mobile container */}
+        <div className="w-full h-screen overflow-hidden bg-white">
           <Routes>
             <Route
               path="/registration"
@@ -42,4 +43,3 @@ export default function App() {
     </BrowserRouter>
   );
 }
-
