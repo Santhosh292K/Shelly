@@ -5,10 +5,11 @@ import { Receipt } from 'lucide-react';
 import { Palette } from 'lucide-react';
 import { HelpCircle } from 'lucide-react';
 import { Tag, BadgePercent, Gift } from 'lucide-react';
-import walmartLogo from './assets/walmart_logo.png';
+import walmartLogo from '../assets/walmart_logo.png';
 import { useNavigate } from 'react-router-dom';
 import WalmartSignIn from './registration_page';
-import shelly_img from './assets/shelly_img.jpg'
+import shelly_img from '../assets/shelly_img.jpg'
+import ScanProduct from './ScanProductPage';
 
 // Walmart Logo Component using local images
 const WalmartLogo = ({ size = 56 }) => (
@@ -24,8 +25,11 @@ const WalmartLogo = ({ size = 56 }) => (
 
 // Top Navigation Component
 const TopNavigation = ({ onMenuToggle, onLogoClick, currentPage }) => {
+
+ const navigate = useNavigate(); // ✅ Add this line
+
   const handleScanClick = () => {
-    alert('Scan to search clicked!');
+    navigate('/scanproduct'); // ✅ Now this will work
   };
 
   return (
@@ -130,7 +134,7 @@ const HamburgerMenu = ({ isOpen, onClose, onNavigate, onSignOut }) => {
     { icon: User, label: 'Account', page: 'account' },
     { icon: Receipt, label: 'Purchase History', page: 'purchase-history' },
     { icon: HelpCircle, label: 'Help', page: 'help' },
-    { icon: QrCode, label: 'Upload Bill', page: 'upload-bill' },
+    { icon: QrCode, label: 'Upload Bill', page: 'scanbill' },
     { icon: Palette, label: 'Style Lab', page: 'style-lab' },
     { icon: Tag, label: 'Offers', page: 'offers' },
     { icon: Gift, label: 'My Rewards', page: 'rewards' },
@@ -411,6 +415,10 @@ function WalmartMobileApp({onSignOut}) {
   };
 
   const handleNavigation = (page) => {
+     if (page === 'scanbill') {
+      navigate('/scanbill'); // ✅ real page navigation
+      return;
+    }
     setCurrentPage(page);
   };
 
