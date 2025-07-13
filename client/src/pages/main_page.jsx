@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 import { Menu, Search, Mic, Keyboard, Home, User, Settings, ScanLine, Leaf, Send, ArrowLeft } from 'lucide-react';
 import { QrCode } from 'lucide-react';
 import { Receipt } from 'lucide-react';
@@ -309,6 +310,7 @@ const FloatingSpheresBackground = () => {
   );
 };
 
+
 // Walmart Logo Component using local images
 const WalmartLogo = ({ size = 56 }) => (
   <div className=" flex items-center justify-center" style={{ width: size, height: size }}>
@@ -323,8 +325,11 @@ const WalmartLogo = ({ size = 56 }) => (
 
 // Top Navigation Component
 const TopNavigation = ({ onMenuToggle, onLogoClick, currentPage }) => {
+
+ const navigate = useNavigate(); // ✅ Add this line
+
   const handleScanClick = () => {
-    alert('Scan to search clicked!');
+    navigate('/scanproduct'); // ✅ Now this will work
   };
 
   return (
@@ -429,7 +434,8 @@ const HamburgerMenu = ({ isOpen, onClose, onNavigate, onSignOut }) => {
     { icon: User, label: 'Account', page: 'account' },
     { icon: Receipt, label: 'Purchase History', page: 'purchase-history' },
     { icon: HelpCircle, label: 'Help', page: 'help' },
-    { icon: QrCode, label: 'Upload Bill', page: 'upload-bill' },
+
+    { icon: QrCode, label: 'Upload Bill', page: 'scanbill' },
     { icon: Palette, label: 'Style Lab', page: 'style-lab' },
     { icon: Tag, label: 'Offers', page: 'offers' },
     { icon: Gift, label: 'My Rewards', page: 'rewards' },
@@ -519,7 +525,128 @@ const HamburgerMenu = ({ isOpen, onClose, onNavigate, onSignOut }) => {
   );
 };
 
-// Generic Page Component
+
+// Floating Spheres Background Component
+const FloatingSpheresBackground = () => {
+  return (
+    <div className="absolute inset-0 w-full h-full overflow-hidden bg-white">
+      {/* Main fluid wave shape */}
+      <div className="absolute top-1/4 -left-4 bg-blue-200 opacity-80 animate-pulse" style={{
+        borderRadius: '50% 50% 60% 40% / 25% 35% 65% 75%',
+        width: '110%',
+        height: '45%',
+        animation: 'slowDrift 25s ease-in-out infinite'
+      }}></div>
+      
+      {/* Floating spheres */}
+      <div className="absolute w-11 h-11 bg-white rounded-full opacity-90 animate-bounce" style={{
+        top: '45%', left: '5%', animation: 'floatUp 7s ease-in-out infinite'
+      }}></div>
+      <div className="absolute w-9 h-9 bg-blue-200 rounded-full opacity-90" style={{
+        top: '16%', right: '25%', animation: 'floatDown 8s ease-in-out infinite 1s'
+      }}></div>
+      <div className="absolute w-6 h-6 bg-blue-200 rounded-full opacity-90" style={{
+        top: '14%', left: '45%', animation: 'gentleFloat 6s ease-in-out infinite 2s'
+      }}></div>
+      <div className="absolute w-14 h-14 bg-white rounded-full opacity-90" style={{
+        top: '30%', right: '10%', animation: 'floatSide 9s ease-in-out infinite 0.5s'
+      }}></div>
+      <div className="absolute w-8 h-8 bg-white rounded-full opacity-90" style={{
+        top: '28%', left: '20%', animation: 'floatUp 8s ease-in-out infinite 3s'
+      }}></div>
+      <div className="absolute w-5 h-5 bg-blue-200 rounded-full opacity-90" style={{
+        top: '12%', right: '5%', animation: 'floatDown 5s ease-in-out infinite 1.5s'
+      }}></div>
+      <div className="absolute w-16 h-16 bg-white rounded-full opacity-90" style={{
+        top: '55%', left: '55%', animation: 'gentleFloat 10s ease-in-out infinite 2.5s'
+      }}></div>
+      <div className="absolute w-5 h-5 bg-blue-200 rounded-full opacity-90" style={{
+        top: '72%', left: '20%', animation: 'floatSide 6s ease-in-out infinite 1s'
+      }}></div>
+      <div className="absolute w-8 h-8 bg-blue-200 rounded-full opacity-90" style={{
+        top: '70%', right: '15%', animation: 'floatUp 7s ease-in-out infinite 4s'
+      }}></div>
+      <div className="absolute w-6 h-6 bg-blue-200 rounded-full opacity-90" style={{
+        top: '74%', left: '60%', animation: 'floatDown 4s ease-in-out infinite 0.8s'
+      }}></div>
+      
+      {/* CSS animations */}
+      <style>{`
+        @keyframes floatUp {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes floatDown {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(12px); }
+        }
+        
+        @keyframes floatSide {
+          0%, 100% { transform: translateX(0px) translateY(0px); }
+          25% { transform: translateX(8px) translateY(-8px); }
+          75% { transform: translateX(-8px) translateY(8px); }
+        }
+        
+        @keyframes gentleFloat {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes slowDrift {
+          0%, 100% { transform: translateX(0px) translateY(0px); }
+          33% { transform: translateX(15px) translateY(-8px); }
+          66% { transform: translateX(-10px) translateY(10px); }
+        }
+        
+        @keyframes buttonPulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+// Page Components
+const MainPage = ({ messageText, setMessageText, isRecording, handleVoiceToggle, handleSendMessage }) => (
+  <div className="flex-1 bg-white relative flex flex-col justify-end">
+    <FloatingSpheresBackground />
+    <div className="flex justify-center items-center gap-3 p-12 bg-transparent z-10">
+      <div className="flex items-center gap-2 flex-1 bg-white bg-opacity-95 rounded-3xl p-2 shadow-lg backdrop-blur-sm border border-white border-opacity-20">
+        <input
+          type="text"
+          value={messageText}
+          onChange={(e) => setMessageText(e.target.value)}
+          placeholder="Talk to me..."
+          className="flex-1 py-2 px-3 border-none rounded-2xl text-sm bg-gray-100 bg-opacity-80 text-gray-800 outline-none"
+        />
+        <button 
+          className={`w-8 h-8 rounded-full border-none cursor-pointer flex items-center justify-center shadow-md ${
+            messageText.trim() 
+              ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white' 
+              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+          }`}
+          onClick={handleSendMessage}
+          disabled={!messageText.trim()}
+        >
+          <Send size={16} />
+        </button>
+      </div>
+      
+      <div className="flex items-center justify-center">
+        <button 
+          className={`w-11 h-11 rounded-full border-none cursor-pointer flex items-center justify-center shadow-md ${
+            isRecording ? 'bg-red-500 animate-pulse' : 'bg-yellow-400'
+          } text-white`}
+          onClick={handleVoiceToggle}
+        >
+          <Mic size={20} />
+        </button>
+      </div>
+    </div>
+  </div>
+);
 const GenericPage = ({ title, onBack }) => (
   <div className="flex-1 bg-gray-50 flex flex-col">
     <div className="bg-white border-b border-gray-200 p-4 flex items-center">
@@ -564,6 +691,7 @@ function WalmartMobileApp({onSignOut}) {
     onSignOut(); 
   };
 
+
   const handleCancelSignOut = () => {
     setShowConfirmModal(false);
   };
@@ -588,6 +716,11 @@ function WalmartMobileApp({onSignOut}) {
   };
 
   const handleNavigation = (page) => {
+
+     if (page === 'scanbill') {
+      navigate('/scanbill'); // ✅ real page navigation
+      return;
+    }
     setCurrentPage(page);
   };
 
@@ -613,6 +746,7 @@ function WalmartMobileApp({onSignOut}) {
 
   return (
     <div className="w-full h-screen bg-white flex flex-col relative font-sans">
+
       {/* Top Navigation Bar */}
       <TopNavigation 
         onMenuToggle={handleMenuToggle} 
