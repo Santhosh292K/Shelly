@@ -323,8 +323,10 @@ const WalmartLogo = ({ size = 56 }) => (
 
 // Top Navigation Component
 const TopNavigation = ({ onMenuToggle, onLogoClick, currentPage }) => {
+ const navigate = useNavigate(); // ✅ Add this line
+
   const handleScanClick = () => {
-    alert('Scan to search clicked!');
+    navigate('/scanproduct'); // ✅ Now this will work
   };
 
   return (
@@ -429,7 +431,7 @@ const HamburgerMenu = ({ isOpen, onClose, onNavigate, onSignOut }) => {
     { icon: User, label: 'Account', page: 'account' },
     { icon: Receipt, label: 'Purchase History', page: 'purchase-history' },
     { icon: HelpCircle, label: 'Help', page: 'help' },
-    { icon: QrCode, label: 'Upload Bill', page: 'upload-bill' },
+    { icon: QrCode, label: 'Upload Bill', page: 'scanbill' },
     { icon: Palette, label: 'Style Lab', page: 'style-lab' },
     { icon: Tag, label: 'Offers', page: 'offers' },
     { icon: Gift, label: 'My Rewards', page: 'rewards' },
@@ -588,6 +590,10 @@ function WalmartMobileApp({onSignOut}) {
   };
 
   const handleNavigation = (page) => {
+     if (page === 'scanbill') {
+      navigate('/scanbill'); // ✅ real page navigation
+      return;
+    }
     setCurrentPage(page);
   };
 
