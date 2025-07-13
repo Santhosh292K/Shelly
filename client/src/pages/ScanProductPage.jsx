@@ -1,9 +1,13 @@
 import React, { useState, useRef, useEffect} from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Camera, Leaf, ShoppingCart, AlertCircle, Recycle, TrendingDown, Star, Receipt, ArrowLeft } from 'lucide-react';
-
+import { Heart, Share2, Info, Award, BarChart3, Factory, Droplets, Zap, Trash2, RotateCcw, MapPin, Clock } from 'lucide-react';
 const ScanProduct = () => {
-  const navigate = useNavigate();
+  const navigate = (direction) => {
+    if (direction === -1) {
+      window.history.back();
+    }
+  };  
+  const [activeTab, setActiveTab] = useState('overview');
   const [isScanning, setIsScanning] = useState(false);
   const [scannedCode, setScannedCode] = useState('');
   const [productData, setProductData] = useState(null);
@@ -16,6 +20,7 @@ const ScanProduct = () => {
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
   const scanningIntervalRef = useRef(null);
+  const fallbackTimeoutRef = useRef(null);
 
   // Mock product database with carbon footprint data
   const mockProducts = {
@@ -24,35 +29,74 @@ const ScanProduct = () => {
       brand: 'Coca-Cola',
       category: 'Beverages',
       price: '$1.99',
-      image: 'https://via.placeholder.com/150x200/ff0000/ffffff?text=Coca-Cola',
+      barcode: '8901030895172',
+      image: 'https://images.unsplash.com/photo-1629203851122-3726ecdf080e?w=400&h=300&fit=crop',
       carbonFootprint: {
         value: 0.33,
         unit: 'kg CO2e',
         rating: 'High',
-        color: 'text-red-500'
+        color: 'text-red-500',
+        breakdown: {
+          production: 45,
+          packaging: 25,
+          transport: 20,
+          disposal: 10
+        }
       },
-      ingredients: ['Carbonated Water', 'High Fructose Corn Syrup', 'Caramel Color', 'Phosphoric Acid', 'Natural Flavors', 'Caffeine'],
+      sustainabilityScore: 42,
+      certifications: ['ISO 14001'],
+      nutritionalHighlights: {
+        calories: 140,
+        sugar: '39g',
+        sodium: '45mg',
+        caffeine: '34mg'
+      },
+      ingredients: [
+        { name: 'Carbonated Water', percentage: 89.2, type: 'base' },
+        { name: 'High Fructose Corn Syrup', percentage: 8.7, type: 'sweetener' },
+        { name: 'Caramel Color', percentage: 1.2, type: 'coloring' },
+        { name: 'Phosphoric Acid', percentage: 0.5, type: 'preservative' },
+        { name: 'Natural Flavors', percentage: 0.3, type: 'flavoring' },
+        { name: 'Caffeine', percentage: 0.1, type: 'stimulant' }
+      ],
+      manufacturingDetails: {
+        origin: 'Atlanta, GA, USA',
+        plantLocation: 'Multiple locations',
+        productionMethod: 'Industrial carbonation',
+        shelfLife: '12 months',
+        recyclingCode: 'PET 1'
+      },
+      environmentalImpact: {
+        waterUsage: '2.4L per 330ml',
+        energyConsumption: '0.89 kWh',
+        wasteGeneration: '0.15kg',
+        recyclingRate: '68%'
+      },
+      healthScore: 25,
       greenAlternatives: [
         {
           name: 'Organic Sparkling Water',
           brand: 'San Pellegrino',
           carbonFootprint: 0.08,
           price: '$1.49',
-          reason: '75% less carbon footprint'
+          reason: '75% less carbon footprint',
+          sustainabilityScore: 85
         },
         {
           name: 'Kombucha Original',
           brand: 'GT\'s Living Foods',
           carbonFootprint: 0.12,
           price: '$2.99',
-          reason: 'Organic & probiotic benefits'
+          reason: 'Organic & probiotic benefits',
+          sustainabilityScore: 78
         },
         {
           name: 'Coconut Water',
           brand: 'Vita Coco',
           carbonFootprint: 0.15,
           price: '$2.49',
-          reason: 'Natural & sustainable packaging'
+          reason: 'Natural & sustainable packaging',
+          sustainabilityScore: 82
         }
       ]
     },
@@ -61,47 +105,141 @@ const ScanProduct = () => {
       brand: 'Nabisco',
       category: 'Snacks',
       price: '$3.49',
-      image: 'https://via.placeholder.com/150x200/000080/ffffff?text=Oreo',
+      barcode: '012000161155',
+      image: 'https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?w=400&h=300&fit=crop',
       carbonFootprint: {
         value: 0.89,
         unit: 'kg CO2e',
         rating: 'Very High',
-        color: 'text-red-600'
+        color: 'text-red-600',
+        breakdown: {
+          production: 52,
+          packaging: 18,
+          transport: 22,
+          disposal: 8
+        }
       },
-      ingredients: ['Enriched Flour', 'Sugar', 'Palm Oil', 'Cocoa', 'High Fructose Corn Syrup', 'Leavening'],
+      sustainabilityScore: 34,
+      certifications: ['Rainforest Alliance'],
+      nutritionalHighlights: {
+        calories: 160,
+        sugar: '12g',
+        sodium: '135mg',
+        fat: '7g'
+      },
+      ingredients: [
+        { name: 'Enriched Flour', percentage: 42.5, type: 'base' },
+        { name: 'Sugar', percentage: 28.3, type: 'sweetener' },
+        { name: 'Palm Oil', percentage: 15.2, type: 'fat' },
+        { name: 'Cocoa', percentage: 8.7, type: 'flavoring' },
+        { name: 'High Fructose Corn Syrup', percentage: 3.1, type: 'sweetener' },
+        { name: 'Leavening Agents', percentage: 2.2, type: 'additive' }
+      ],
+      manufacturingDetails: {
+        origin: 'New Jersey, USA',
+        plantLocation: 'Fair Lawn, NJ',
+        productionMethod: 'Automated baking',
+        shelfLife: '2 years',
+        recyclingCode: 'PP 5'
+      },
+      environmentalImpact: {
+        waterUsage: '1.8L per package',
+        energyConsumption: '1.2 kWh',
+        wasteGeneration: '0.12kg',
+        recyclingRate: '45%'
+      },
+      healthScore: 28,
       greenAlternatives: [
         {
           name: 'Organic Oat Cookies',
           brand: 'Annie\'s',
           carbonFootprint: 0.31,
           price: '$4.99',
-          reason: '65% less carbon footprint'
+          reason: '65% less carbon footprint',
+          sustainabilityScore: 76
         },
         {
           name: 'Almond Flour Cookies',
           brand: 'Simple Mills',
           carbonFootprint: 0.42,
           price: '$5.49',
-          reason: 'Gluten-free & sustainable ingredients'
+          reason: 'Gluten-free & sustainable ingredients',
+          sustainabilityScore: 71
         }
       ]
     },
     '1234567890123': {
-      name: 'Sample Product',
+      name: 'Organic Quinoa Crackers',
       brand: 'EcoFriendly Co.',
-      category: 'Food',
-      price: '$2.99',
-      image: 'https://via.placeholder.com/150x200/22c55e/ffffff?text=Sample',
+      category: 'Snacks',
+      price: '$4.99',
+      barcode: '1234567890123',
+      image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&fit=crop',
       carbonFootprint: {
         value: 0.15,
         unit: 'kg CO2e',
         rating: 'Low',
-        color: 'text-green-500'
+        color: 'text-green-500',
+        breakdown: {
+          production: 38,
+          packaging: 12,
+          transport: 35,
+          disposal: 15
+        }
       },
-      ingredients: ['Organic Wheat', 'Natural Flavors', 'Sea Salt'],
+      sustainabilityScore: 89,
+      certifications: ['USDA Organic', 'Non-GMO Project', 'B-Corp'],
+      nutritionalHighlights: {
+        calories: 120,
+        protein: '4g',
+        fiber: '3g',
+        sodium: '90mg'
+      },
+      ingredients: [
+        { name: 'Organic Quinoa Flour', percentage: 65.0, type: 'base' },
+        { name: 'Organic Sunflower Oil', percentage: 18.5, type: 'fat' },
+        { name: 'Organic Brown Rice Flour', percentage: 12.0, type: 'base' },
+        { name: 'Sea Salt', percentage: 2.5, type: 'seasoning' },
+        { name: 'Organic Herbs', percentage: 2.0, type: 'flavoring' }
+      ],
+      manufacturingDetails: {
+        origin: 'Boulder, CO, USA',
+        plantLocation: 'Certified Organic Facility',
+        productionMethod: 'Stone ground & baked',
+        shelfLife: '18 months',
+        recyclingCode: 'Compostable'
+      },
+      environmentalImpact: {
+        waterUsage: '0.8L per package',
+        energyConsumption: '0.3 kWh',
+        wasteGeneration: '0.02kg',
+        recyclingRate: '95%'
+      },
+      healthScore: 85,
       greenAlternatives: []
     }
   };
+
+  // Function to select a random product
+  const selectRandomProduct = () => {
+    const mockBarcodes = Object.keys(mockProducts);
+    const randomBarcode = mockBarcodes[Math.floor(Math.random() * mockBarcodes.length)];
+    setScanningStatus('No barcode detected - showing random product...');
+
+    
+    // Clear intervals and timeouts
+    if (scanningIntervalRef.current) {
+      clearInterval(scanningIntervalRef.current);
+      scanningIntervalRef.current = null;
+    }
+    
+    setTimeout(() => {
+      setScannedCode(randomBarcode);
+      fetchProductData(randomBarcode);
+      stopScanning();
+    }, 1000);
+  };
+
   // Start camera for scanning
   const startScanning = async () => {
     try {
@@ -128,6 +266,11 @@ const ScanProduct = () => {
             setCameraReady(true);
             setScanningStatus('Looking for barcode...');
             startScanningLoop();
+            
+            // Start 2-second fallback timer
+            fallbackTimeoutRef.current = setTimeout(() => {
+              selectRandomProduct();
+            }, 2000);
           }).catch(err => {
             console.error('Error playing video:', err);
             setError('Failed to start camera preview');
@@ -160,7 +303,7 @@ const ScanProduct = () => {
       if (cameraReady && videoRef.current) {
         detectBarcode();
       }
-    }, 2000);
+    }, 500); // Reduced interval for more frequent detection attempts
   };
 
   // Barcode detection function
@@ -186,6 +329,12 @@ const ScanProduct = () => {
     const hasBarcode = simulateBarcodeDetection(imageData);
     
     if (hasBarcode) {
+      // Clear the fallback timeout since we detected a barcode
+      if (fallbackTimeoutRef.current) {
+        clearTimeout(fallbackTimeoutRef.current);
+        fallbackTimeoutRef.current = null;
+      }
+      
       const mockBarcodes = Object.keys(mockProducts);
       const randomBarcode = mockBarcodes[Math.floor(Math.random() * mockBarcodes.length)];
       
@@ -229,12 +378,14 @@ const ScanProduct = () => {
       clearInterval(scanningIntervalRef.current);
       scanningIntervalRef.current = null;
     }
+    if (fallbackTimeoutRef.current) {
+      clearTimeout(fallbackTimeoutRef.current);
+      fallbackTimeoutRef.current = null;
+    }
     setIsScanning(false);
     setCameraReady(false);
     setScanningStatus('Looking for barcode...');
   };
-
-  // Manual trigger for barcode simulation (removed - now automatic)
 
   // Fetch product data
   const fetchProductData = async (barcode) => {
@@ -282,19 +433,77 @@ const ScanProduct = () => {
       if (scanningIntervalRef.current) {
         clearInterval(scanningIntervalRef.current);
       }
+      if (fallbackTimeoutRef.current) {
+        clearTimeout(fallbackTimeoutRef.current);
+      }
     };
   }, []);
+  
 
   const getCarbonRatingColor = (rating) => {
-    switch (rating) {
-      case 'Low': return 'bg-green-100 text-green-800';
-      case 'Medium': return 'bg-yellow-100 text-yellow-800';
-      case 'High': return 'bg-orange-100 text-orange-800';
-      case 'Very High': return 'bg-red-100 text-red-800';
+    switch (rating?.toLowerCase()) {
+      case 'low': return 'bg-green-100 text-green-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-800';
+      case 'high': return 'bg-red-100 text-red-800';
+      case 'very high': return 'bg-red-200 text-red-900';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
+  const getSustainabilityColor = (score) => {
+    if (score >= 70) return 'text-green-600';
+    if (score >= 50) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
+  const getHealthScoreColor = (score) => {
+    if (score >= 70) return 'bg-green-500';
+    if (score >= 50) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  const getIngredientTypeColor = (type) => {
+    const colors = {
+      base: 'bg-blue-100 text-blue-800',
+      sweetener: 'bg-purple-100 text-purple-800',
+      fat: 'bg-orange-100 text-orange-800',
+      flavoring: 'bg-green-100 text-green-800',
+      preservative: 'bg-red-100 text-red-800',
+      additive: 'bg-gray-100 text-gray-800',
+      coloring: 'bg-yellow-100 text-yellow-800',
+      stimulant: 'bg-pink-100 text-pink-800',
+      seasoning: 'bg-indigo-100 text-indigo-800'
+    };
+    return colors[type] || 'bg-gray-100 text-gray-800';
+  };
+
+  const TabButton = ({ id, label, icon: Icon, active }) => (
+    <button
+      onClick={() => setActiveTab(id)}
+      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+        active 
+          ? 'bg-blue-600 text-white shadow-md' 
+          : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+      }`}
+    >
+      <Icon size={18} />
+      {label}
+    </button>
+  );
+
+  const StatCard = ({ icon: Icon, title, value, color = 'text-gray-800' }) => (
+    <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+      <div className="flex items-center gap-3">
+        <div className="p-2 bg-blue-50 rounded-lg">
+          <Icon className="text-blue-600" size={20} />
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">{title}</p>
+          <p className={`text-lg font-semibold ${color}`}>{value}</p>
+        </div>
+      </div>
+    </div>
+  );
   // Main scanner view
   if (!productData && !loading) {
     return (
@@ -436,9 +645,6 @@ const ScanProduct = () => {
                 <p className="text-sm text-gray-600">
                   Position a barcode within the frame to scan
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Hold steady for automatic detection
-                </p>
               </div>
             </div>
           )}
@@ -516,97 +722,328 @@ const ScanProduct = () => {
 
   // Product results view
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
-      <div className="bg-blue-600 px-6 py-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate(-1)}
-            className="text-white hover:text-blue-100 transition-colors"
-          >
-            <ArrowLeft size={24} />
-          </button>
-          <div>
-            <h1 className="text-xl font-semibold text-white">Product Details</h1>
-            <p className="text-sm text-blue-100">Carbon footprint analysis</p>
+      <div className="bg-blue shadow-sm border-b border-gray-200">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate(-1)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <ArrowLeft size={24} className="text-gray-600" />
+              </button>
+              <div>
+                <h1 className="text-xl font-semibold text-gray-800">Product Analysis</h1>
+              </div>
+            </div>
+            
           </div>
         </div>
       </div>
 
       <div className="p-6 space-y-6">
-        {/* Product Info */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <img
-                src={productData.image}
-                alt={productData.name}
-                className="w-full h-48 object-cover rounded-lg mb-4"
-              />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">{productData.name}</h2>
-              <p className="text-gray-600 mb-2">Brand: {productData.brand}</p>
-              <p className="text-gray-600 mb-2">Category: {productData.category}</p>
-              <p className="text-2xl font-bold text-green-600 mb-4">{productData.price}</p>
-              
-              {/* Carbon Footprint */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <Leaf className="text-green-600" size={20} />
-                  Carbon Footprint
-                </h3>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-2xl font-bold text-gray-800">
-                    {productData.carbonFootprint.value}
-                  </span>
-                  <span className="text-gray-600">{productData.carbonFootprint.unit}</span>
-                  <span className={`px-2 py-1 rounded-full text-sm font-medium ${getCarbonRatingColor(productData.carbonFootprint.rating)}`}>
-                    {productData.carbonFootprint.rating}
-                  </span>
-                </div>
+        {/* Product Hero Section */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Product Image */}
+            <div className="lg:col-span-1">
+              <div className="relative">
+                <img
+                  src={productData.image}
+                  alt={productData.name}
+                  className="w-full h-80 object-cover rounded-xl shadow-md"
+                />
               </div>
             </div>
-          </div>
+            
+            {/* Product Info */}
+            <div className="lg:col-span-2 space-y-6">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                    {productData.category}
+                  </span>
+                  {productData.certifications?.map((cert, index) => (
+                    <span key={index} className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                      {cert}
+                    </span>
+                  ))}
+                </div>
+                <h2 className="text-3xl font-bold text-gray-800 mb-2">{productData.name}</h2>
+                <p className="text-lg text-gray-600 mb-1">by {productData.brand}</p>
+                <p className="text-3xl font-bold text-green-600">{productData.price}</p>
+              </div>
 
-          {/* Ingredients */}
-          <div className="mt-6">
-            <h3 className="font-semibold text-gray-800 mb-2">Ingredients:</h3>
-            <div className="flex flex-wrap gap-2">
-              {productData.ingredients.map((ingredient, index) => (
-                <span key={index} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                  {ingredient}
-                </span>
-              ))}
+              {/* Key Metrics */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <StatCard
+                  icon={Leaf}
+                  title="Carbon Footprint"
+                  value={`${productData.carbonFootprint?.value} ${productData.carbonFootprint?.unit}`}
+                  color={productData.carbonFootprint?.color}
+                />
+                <StatCard
+                  icon={Award}
+                  title="Sustainability Score"
+                  value={`${productData.sustainabilityScore}/100`}
+                  color={getSustainabilityColor(productData.sustainabilityScore)}
+                />
+                <StatCard
+                  icon={Heart}
+                  title="Health Score"
+                  value={`${productData.healthScore}/100`}
+                  color={getSustainabilityColor(productData.healthScore)}
+                />
+                <StatCard
+                  icon={RotateCcw}
+                  title="Recyclability"
+                  value={`${productData.environmentalImpact?.recyclingRate}`}
+                  color="text-green-600"
+                />
+              </div>
+
             </div>
           </div>
         </div>
 
-        {/* Green Alternatives */}
-        {productData.greenAlternatives.length > 0 && (
+        {/* Tabs Navigation */}
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          <TabButton id="overview" label="Overview" icon={Info} active={activeTab === 'overview'} />
+          <TabButton id="sustainability" label="Sustainability" icon={Leaf} active={activeTab === 'sustainability'} />
+          <TabButton id="ingredients" label="Ingredients" icon={BarChart3} active={activeTab === 'ingredients'} />
+          <TabButton id="manufacturing" label="Manufacturing" icon={Factory} active={activeTab === 'manufacturing'} />
+          <TabButton id="alternatives" label="Alternatives" icon={Recycle} active={activeTab === 'alternatives'} />
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'overview' && (
+          <div className="space-y-6">
+            {/* Carbon Footprint Breakdown */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <Leaf className="text-green-600" />
+                Carbon Footprint Breakdown
+              </h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-3xl font-bold text-gray-800">
+                      {productData.carbonFootprint?.value}
+                    </span>
+                    <span className="text-gray-600">{productData.carbonFootprint?.unit}</span>
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getCarbonRatingColor(productData.carbonFootprint?.rating)}`}>
+                      {productData.carbonFootprint?.rating}
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {Object.entries(productData.carbonFootprint?.breakdown || {}).map(([key, value]) => (
+                    <div key={key} className="flex items-center justify-between">
+                      <span className="capitalize text-gray-600">{key}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-32 bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-blue-600 h-2 rounded-full"
+                            style={{ width: `${value}%` }}
+                          />
+                        </div>
+                        <span className="text-sm font-medium text-gray-800">{value}%</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Nutritional Information */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">Nutritional Highlights</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {Object.entries(productData.nutritionalHighlights || {}).map(([key, value]) => (
+                  <div key={key} className="text-center p-4 bg-gray-50 rounded-lg">
+                    <p className="text-2xl font-bold text-gray-800">{value}</p>
+                    <p className="text-sm text-gray-600 capitalize">{key}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'sustainability' && (
+          <div className="space-y-6">
+            {/* Environmental Impact */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">Environmental Impact</h3>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatCard
+                  icon={Droplets}
+                  title="Water Usage"
+                  value={productData.environmentalImpact?.waterUsage}
+                  color="text-blue-600"
+                />
+                <StatCard
+                  icon={Zap}
+                  title="Energy Consumption"
+                  value={productData.environmentalImpact?.energyConsumption}
+                  color="text-yellow-600"
+                />
+                <StatCard
+                  icon={Trash2}
+                  title="Waste Generation"
+                  value={productData.environmentalImpact?.wasteGeneration}
+                  color="text-red-600"
+                />
+                <StatCard
+                  icon={RotateCcw}
+                  title="Recycling Rate"
+                  value={productData.environmentalImpact?.recyclingRate}
+                  color="text-green-600"
+                />
+              </div>
+            </div>
+
+            {/* Sustainability Score Breakdown */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">Sustainability Analysis</h3>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-gray-800">{productData.sustainabilityScore}</div>
+                  <div className="text-sm text-gray-600">out of 100</div>
+                </div>
+                <div className="flex-1">
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div
+                      className={`h-3 rounded-full ${getSustainabilityColor(productData.sustainabilityScore).replace('text-', 'bg-')}`}
+                      style={{ width: `${productData.sustainabilityScore}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-gray-800">Positive Factors</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Certified production process</li>
+                    <li>• Recyclable packaging</li>
+                    <li>• Energy-efficient manufacturing</li>
+                  </ul>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-gray-800">Areas for Improvement</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• High carbon footprint</li>
+                    <li>• Water-intensive production</li>
+                    <li>• Limited organic ingredients</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'ingredients' && (
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Ingredient Analysis</h3>
+            <div className="space-y-4">
+              {productData.ingredients?.map((ingredient, index) => (
+                <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <span className="font-medium text-gray-800">{ingredient.name}</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getIngredientTypeColor(ingredient.type)}`}>
+                      {ingredient.type}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-24 bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-600 h-2 rounded-full"
+                        style={{ width: `${ingredient.percentage}%` }}
+                      />
+                    </div>
+                    <span className="text-sm font-medium text-gray-800 min-w-[3rem]">
+                      {ingredient.percentage}%
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'manufacturing' && (
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Manufacturing Details</h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              <StatCard
+                icon={MapPin}
+                title="Origin"
+                value={productData.manufacturingDetails?.origin}
+              />
+              <StatCard
+                icon={Factory}
+                title="Plant Location"
+                value={productData.manufacturingDetails?.plantLocation}
+              />
+              <StatCard
+                icon={Clock}
+                title="Shelf Life"
+                value={productData.manufacturingDetails?.shelfLife}
+              />
+              <StatCard
+                icon={RotateCcw}
+                title="Recycling Code"
+                value={productData.manufacturingDetails?.recyclingCode}
+              />
+            </div>
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+              <h4 className="font-semibold text-blue-800 mb-2">Production Method</h4>
+              <p className="text-blue-700">{productData.manufacturingDetails?.productionMethod}</p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'alternatives' && (
           <div className="bg-white rounded-xl shadow-sm p-6">
             <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
               <Recycle className="text-green-600" />
               Green Alternatives
             </h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {productData.greenAlternatives.map((alternative, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <h4 className="font-semibold text-gray-800 mb-1">{alternative.name}</h4>
-                  <p className="text-sm text-gray-600 mb-2">{alternative.brand}</p>
-                  <p className="text-lg font-bold text-green-600 mb-2">{alternative.price}</p>
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingDown className="text-green-500" size={16} />
-                    <span className="text-sm font-medium text-green-700">
-                      {alternative.carbonFootprint} kg CO2e
-                    </span>
+            {productData.greenAlternatives?.length > 0 ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {productData.greenAlternatives.map((alternative, index) => (
+                  <div key={index} className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
+                    <h4 className="font-semibold text-gray-800 mb-2">{alternative.name}</h4>
+                    <p className="text-sm text-gray-600 mb-3">{alternative.brand}</p>
+                    <p className="text-xl font-bold text-green-600 mb-3">{alternative.price}</p>
+                    <div className="flex items-center gap-2 mb-3">
+                      <TrendingDown className="text-green-500" size={16} />
+                      <span className="text-sm font-medium text-green-700">
+                        {alternative.carbonFootprint} kg CO2e
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 bg-green-50 rounded-lg p-3 mb-3">
+                      {alternative.reason}
+                    </p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-gray-600">
+                        Sustainability: {alternative.sustainabilityScore}/100
+                      </span>
+                      <button className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-colors">
+                        View Details
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-600 bg-green-50 rounded-lg p-2">
-                    {alternative.reason}
-                  </p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <AlertCircle className="mx-auto text-gray-400 mb-4" size={48} />
+                <p className="text-gray-600">No green alternatives available for this product.</p>
+              </div>
+            )}
           </div>
         )}
       </div>
