@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Heart, ShoppingCart, AlertCircle, Utensils, Home, Baby, Gamepad2, Car, Dumbbell, Palette, Book, Music, Shirt, Pill, Apple, Wheat, Milk, Fish, Egg, TreePine, Sparkles, Target, Clock, DollarSign, Star, Check, Leaf, CircleOff, VeganIcon, AppleIcon, Salad, Carrot, NutIcon, Shrimp, BeanIcon } from 'lucide-react';
 import walmart_logo from '../assets/walmart_logo.png'
 
-const PersonalizationPage = () => {
+const PersonalizationPage = ({onComplete }) => {
   const [formData, setFormData] = useState({
     dietaryPreferences: [],
     allergies: [],
@@ -56,8 +56,8 @@ const PersonalizationPage = () => {
 
   const handleSubmit = () => {
     console.log('Personalization data:', formData);
-    alert('Welcome to Walmart! Your personalized shopping experience is ready.');
-    scrollToTop();
+    // Call the onComplete callback instead of showing alert
+    onComplete && onComplete();
   };
 
   const ProgressBar = () => (
