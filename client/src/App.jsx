@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import RegistrationPage from './registration_page';
 import WalmartMobileApp from './main_page';
+import ScanBill from './pages/ScanBillPage';
+import ScanProduct from './pages/ScanProductPage';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -37,9 +39,13 @@ export default function App() {
               path="*"
               element={<Navigate to={isAuthenticated ? "/app" : "/registration"} />}
             />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/scanproduct" element={<ScanProduct />} />
+        <Route path="/scanbill" element={<ScanBill />} />
           </Routes>
         </div>
       </div>
     </BrowserRouter>
   );
 }
+
