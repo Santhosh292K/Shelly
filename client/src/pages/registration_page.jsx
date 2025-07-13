@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, ArrowRight } from 'lucide-react';
-import walmartLogo from './assets/walmart_logo.png';
-import googleLogo from './assets/google_logo.png';
+import walmartLogo from '../assets/walmart_logo.png';
+import googleLogo from '../assets/google_logo.png';
 
 // ✅ Sign In / Sign Up Component
 function WalmartSignIn({ onComplete }) {

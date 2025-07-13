@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import RegistrationPage from './registration_page';
-import WalmartMobileApp from './main_page';
+import RegistrationPage from './pages/registration_page';
+import WalmartMobileApp from './pages/main_page';
 import ScanBill from './pages/ScanBillPage';
 import ScanProduct from './pages/ScanProductPage';
 
@@ -35,11 +35,11 @@ export default function App() {
                 )
               }
             />
-            <Route
+       000     <Route
               path="*"
               element={<Navigate to={isAuthenticated ? "/app" : "/registration"} />}
             />
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<Navigate to={isAuthenticated ? "/app" : "/registration"} />} />
         <Route path="/scanproduct" element={<ScanProduct />} />
         <Route path="/scanbill" element={<ScanBill />} />
           </Routes>
