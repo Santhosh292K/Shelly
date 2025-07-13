@@ -10,9 +10,11 @@ import { useNavigate } from 'react-router-dom';
 import WalmartSignIn from './registration_page';
 import shelly_img from '../assets/shelly_img.jpg';
 import shelly_wave from '../assets/shelly_wave.webm';
+import shelly_listens from '../assets/shelly_listens.webm'
+
 
 // Shelly AI Assistant Component
-const ShellyAssistant = () => {
+const ShellyAssistant = ({ isRecording }) => {
   const [showDialog, setShowDialog] = useState(true);
   const [currentMessage, setCurrentMessage] = useState(0);
   
@@ -21,23 +23,34 @@ const ShellyAssistant = () => {
     "Welcome to Walmart! How can I help you today?",
     "Ask me anything about products, deals, or your shopping needs!"
   ];
+  
+  // Updated to show listening message when recording
+  const displayMessage = isRecording ? "I'm listening..." : welcomeMessages[currentMessage];
 
   useEffect(() => {
-    // Auto-cycle through welcome messages
-    const interval = setInterval(() => {
-      setCurrentMessage((prev) => (prev + 1) % welcomeMessages.length);
-    }, 4000);
+    // Only cycle through messages when NOT recording
+    if (!isRecording) {
+      const interval = setInterval(() => {
+        setCurrentMessage((prev) => (prev + 1) % welcomeMessages.length);
+      }, 4000);
 
-    // Hide dialog after 12 seconds
-    const hideTimer = setTimeout(() => {
-      setShowDialog(false);
-    }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [isRecording]);
 
-    return () => {
-      clearInterval(interval);
-      clearTimeout(hideTimer);
-    };
-  }, []);
+  useEffect(() => {
+    // Show dialog when recording starts
+    if (isRecording) {
+      setShowDialog(true);
+    } else {
+      // Hide dialog after 5 seconds when not recording
+      const hideTimer = setTimeout(() => {
+        setShowDialog(false);
+      }, 5000);
+
+      return () => clearTimeout(hideTimer);
+    }
+  }, [isRecording]);
 
   const handleVideoClick = () => {
     setShowDialog(true);
@@ -57,12 +70,14 @@ const ShellyAssistant = () => {
             {/* Message content */}
             <div className="text-center">
               <div className="flex items-center justify-center mb-0">
-                <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-green-500 rounded-full mr-2 animate-pulse shadow-lg"></div>
+                <div className={`w-3 h-3 rounded-full mr-2 shadow-lg ${
+                  isRecording ? 'bg-red-500 animate-pulse' : 'bg-gradient-to-r from-green-400 to-green-500 animate-pulse'
+                }`}></div>
                 <span className="text-sm font-bold text-blue-600 uppercase tracking-wide">Shelly Says</span>
               </div>
               
               <p className="text-base text-gray-700 leading-relaxed font-semibold mb-2">
-                {welcomeMessages[currentMessage]}
+                {displayMessage}
               </p>
               
               {/* Fun interactive elements */}
@@ -72,12 +87,7 @@ const ShellyAssistant = () => {
                   <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
                   <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
                 </div>
-                <div className="text-2xl animate-bounce">🛒</div>
-              </div>
-              
-              {/* Progress indicator */}
-              <div className="flex justify-center space-x-1 mb-2">
-               
+                <div className="text-2xl animate-bounce">{isRecording ? '🎤' : '🛒'}</div>
               </div>
             </div>
             
@@ -98,15 +108,14 @@ const ShellyAssistant = () => {
         onClick={handleVideoClick}
       >
         <video
-          src={shelly_wave}
+          key={isRecording ? 'listening' : 'waving'} // Force re-render when switching videos
+          src={isRecording ? shelly_listens : shelly_wave}
           autoPlay
           loop
           muted
           playsInline
           className="w-full h-auto scale-150 mt-12"
         />
-        
-       
       </div>
 
       {/* Floating particles around Shelly */}
@@ -183,49 +192,57 @@ const ShellyAssistant = () => {
 };
 
 // Updated MainPage Component
-const MainPage = ({ messageText, setMessageText, isRecording, handleVoiceToggle, handleSendMessage }) => (
-  <div className="flex-1 bg-white relative flex flex-col justify-end">
-    <FloatingSpheresBackground />
-    
-    {/* Shelly AI Assistant - positioned in center above input */}
-    <ShellyAssistant />
-    
-    {/* Input area - moved to bottom */}
-    <div className="flex justify-center items-center gap-3 p-12 bg-transparent z-10">
-      <div className="flex items-center gap-2 flex-1 bg-white bg-opacity-95 rounded-3xl p-2 shadow-lg backdrop-blur-sm border border-white border-opacity-20">
-        <input
-          type="text"
-          value={messageText}
-          onChange={(e) => setMessageText(e.target.value)}
-          placeholder="Ask Shelly anything..."
-          className="flex-1 py-2 px-3 border-none rounded-2xl text-sm bg-gray-100 bg-opacity-80 text-gray-800 outline-none"
-        />
-        <button 
-          className={`w-8 h-8 rounded-full border-none cursor-pointer flex items-center justify-center shadow-md ${
-            messageText.trim() 
-              ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white' 
-              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-          }`}
-          onClick={handleSendMessage}
-          disabled={!messageText.trim()}
-        >
-          <Send size={16} />
-        </button>
+const MainPage = ({ messageText, setMessageText, isRecording, handleVoiceToggle, handleSendMessage }) => {
+  console.log('MainPage isRecording:', isRecording); // Debug log
+  
+  return (
+    <div className="flex-1 bg-white relative flex flex-col justify-end">
+      <FloatingSpheresBackground />
+      
+      {/* Shelly AI Assistant - positioned in center above input */}
+      <div className="flex-1 flex items-center justify-center">
+        <ShellyAssistant isRecording={isRecording} />
       </div>
       
-      <div className="flex items-center justify-center">
-        <button 
-          className={`w-11 h-11 rounded-full border-none cursor-pointer flex items-center justify-center shadow-md ${
-            isRecording ? 'bg-red-500 animate-pulse' : 'bg-yellow-400'
-          } text-white`}
-          onClick={handleVoiceToggle}
-        >
-          <Mic size={20} />
-        </button>
+      {/* Input area - moved to bottom */}
+      <div className="flex justify-center items-center gap-3 p-12 bg-transparent z-10">
+        <div className="flex items-center gap-2 flex-1 bg-white bg-opacity-95 rounded-3xl p-2 shadow-lg backdrop-blur-sm border border-white border-opacity-20">
+          <input
+            type="text"
+            value={messageText}
+            onChange={(e) => setMessageText(e.target.value)}
+            placeholder="Ask Shelly anything..."
+            className="flex-1 py-2 px-3 border-none rounded-2xl text-sm bg-gray-100 bg-opacity-80 text-gray-800 outline-none"
+          />
+          <button 
+            className={`w-8 h-8 rounded-full border-none cursor-pointer flex items-center justify-center shadow-md ${
+              messageText.trim() 
+                ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white' 
+                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            }`}
+            onClick={handleSendMessage}
+            disabled={!messageText.trim()}
+          >
+            <Send size={16} />
+          </button>
+        </div>
+        
+        <div className="flex items-center justify-center">
+          <button 
+            className={`w-11 h-11 rounded-full border-none cursor-pointer flex items-center justify-center shadow-md transition-all duration-200 ${
+              isRecording 
+                ? 'bg-red-500 animate-pulse scale-110' 
+                : 'bg-yellow-400 hover:bg-yellow-500'
+            } text-white`}
+            onClick={handleVoiceToggle}
+          >
+            <Mic size={20} />
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Floating Spheres Background Component (unchanged)
 const FloatingSpheresBackground = () => {
@@ -551,7 +568,12 @@ function WalmartMobileApp({onSignOut}) {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const handleVoiceToggle = () => {
-    setIsRecording((prev) => !prev);
+    console.log('Voice toggle clicked, current state:', isRecording);
+    setIsRecording((prev) => {
+      const newState = !prev;
+      console.log('New recording state:', newState);
+      return newState;
+    });
   };
 
   const navigate = useNavigate();
@@ -616,6 +638,8 @@ function WalmartMobileApp({onSignOut}) {
     };
     return titles[page] || page;
   };
+
+  console.log('WalmartMobileApp render, isRecording:', isRecording);
 
   return (
     <div className="w-full h-screen bg-white flex flex-col relative font-sans">
