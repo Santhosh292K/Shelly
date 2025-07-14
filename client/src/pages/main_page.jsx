@@ -15,7 +15,7 @@ import shelly_rotate from '../assets/shelly_rotate.webm'
 import shelly_chocolate from '../assets/shelly_chocolate.webm'
 
 // Shelly AI Assistant Component
-const ShellyAssistant = ({ isRecording }) => {
+const ShellyAssistant = ({ isRecording, replyMessage, showReply }) => {
   const [showDialog, setShowDialog] = useState(true);
   const [currentMessage, setCurrentMessage] = useState(0);
   const [currentVideo, setCurrentVideo] = useState('wave');
@@ -24,7 +24,8 @@ const ShellyAssistant = ({ isRecording }) => {
   const [chocolateVideoShown, setChocolateVideoShown] = useState(false);
   const [hasFinishedWelcome, setHasFinishedWelcome] = useState(false);
   const [currentPhase, setCurrentPhase] = useState("welcome"); 
-  const [videoKey, setVideoKey] = useState(0); // Add key for video re-rendering
+  const [videoKey, setVideoKey] = useState(0); 
+  // Add key for video re-rendering
 // 'welcome', 'chocolate', 'idle', 'recording'
 
   
@@ -41,11 +42,13 @@ const ShellyAssistant = ({ isRecording }) => {
   // Updated to show listening message when recording, chocolate message when showing chocolate video
 const displayMessage = isRecording
   ? "I'm listening..."
-  : showChocolateVideo
-    ? chocolateMessage
-    : currentPhase === "welcome"
-      ? welcomeMessages[currentMessage]
-      : "";
+  : showReply && replyMessage
+    ? replyMessage
+    : showChocolateVideo
+      ? chocolateMessage
+      : currentPhase === "welcome"
+        ? welcomeMessages[currentMessage]
+        : "";
 
 
   const videoPattern = ['wave', 'wave', 'rotate'];
@@ -128,7 +131,7 @@ useEffect(() => {
 }, [currentPhase, isRecording]);
 
 useEffect(() => {
-  if (isRecording || showChocolateVideo) {
+  if (isRecording || showChocolateVideo || (showReply && replyMessage)) {
     setShowDialog(true);
   } else {
     const hideTimer = setTimeout(() => {
@@ -139,7 +142,7 @@ useEffect(() => {
 
     return () => clearTimeout(hideTimer);
   }
-}, [isRecording, showChocolateVideo, currentMessage]);
+}, [isRecording, showChocolateVideo, currentMessage, showReply, replyMessage]);
 
   const handleVideoClick = () => {
     setShowDialog(true);
@@ -305,8 +308,8 @@ useEffect(() => {
 };
 
 // Updated MainPage Component
-const MainPage = ({ messageText, setMessageText, isRecording, handleVoiceToggle, handleSendMessage }) => {
-  console.log('MainPage isRecording:', isRecording); // Debug log
+const MainPage = ({ messageText, setMessageText, isRecording, handleVoiceToggle, handleSendMessage, replyMessage, showReply }) => {
+  console.log('MainPage isRecording:', isRecording);
   
   return (
     <div className="flex-1 bg-white relative flex flex-col justify-end">
@@ -314,10 +317,14 @@ const MainPage = ({ messageText, setMessageText, isRecording, handleVoiceToggle,
       
       {/* Shelly AI Assistant - positioned in center above input */}
       <div className="flex-1 relative flex items-center justify-center pt-17">
-        <ShellyAssistant isRecording={isRecording} />
+        <ShellyAssistant 
+          isRecording={isRecording} 
+          replyMessage={replyMessage}
+          showReply={showReply}
+        />
       </div>
       
-      {/* Input area - moved to bottom */}
+      {/* Input area remains the same */}
       <div className="flex justify-center items-center gap-3 p-12 bg-transparent z-10">
         <div className="flex items-center gap- flex-1 bg-white bg-opacity-95 rounded-3xl p-2 shadow-lg backdrop-blur-sm border border-white border-opacity-20">
           <input
@@ -680,6 +687,11 @@ function WalmartMobileApp({onSignOut}) {
   const [isRecording, setIsRecording] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  
+  // Add these new state variables:
+  const [replyMessage, setReplyMessage] = useState("");
+  const [showReply, setShowReply] = useState(false);
+
 
   const handleVoiceToggle = () => {
     console.log('Voice toggle clicked, current state:', isRecording);
@@ -708,8 +720,21 @@ function WalmartMobileApp({onSignOut}) {
 
   const handleSendMessage = () => {
     if (messageText.trim()) {
-      alert(`Message sent: ${messageText}`);
+      // Simulate API call or processing
+      const simulatedReply = `Thanks for asking about "${messageText.trim()}"! I'm here to help you with that.`;
+      
+      // Show reply
+      setReplyMessage(simulatedReply);
+      setShowReply(true);
+      
+      // Clear input
       setMessageText('');
+      
+      // Hide reply after 5 seconds
+      setTimeout(() => {
+        setShowReply(false);
+        setReplyMessage("");
+      }, 5000);
     }
   };
 
@@ -781,19 +806,21 @@ function WalmartMobileApp({onSignOut}) {
 
       {/* Main Content Area */}
       {currentPage === 'main' ? (
-        <MainPage 
-          messageText={messageText}
-          setMessageText={setMessageText}
-          isRecording={isRecording}
-          handleVoiceToggle={handleVoiceToggle}
-          handleSendMessage={handleSendMessage}
-        />
-      ) : (
-        <GenericPage 
-          title={getPageTitle(currentPage)}
-          onBack={handleBackToMain}
-        />
-      )}
+    <MainPage 
+      messageText={messageText}
+      setMessageText={setMessageText}
+      isRecording={isRecording}
+      handleVoiceToggle={handleVoiceToggle}
+      handleSendMessage={handleSendMessage}
+      replyMessage={replyMessage}
+      showReply={showReply}
+    />
+  ) : (
+    <GenericPage 
+      title={getPageTitle(currentPage)}
+      onBack={handleBackToMain}
+    />
+  )}
     </div>
   );
 }
