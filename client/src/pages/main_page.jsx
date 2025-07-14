@@ -14,6 +14,61 @@ import shelly_listens from '../assets/shelly_listens.webm'
 import shelly_rotate from '../assets/shelly_rotate.webm'
 import shelly_chocolate from '../assets/shelly_chocolate.webm'
 
+const sampleReplies = {
+    // Product searches
+    "milk": "I found organic milk in aisle 12! It's $3.99 for a gallon. Would you like me to add it to your cart?",
+    "bread": "Fresh bakery bread is available in aisle 8. I recommend the whole grain option - it's healthier and only $2.49!",
+    "apples": "Crisp Gala apples are on sale today! $1.99/lb in the produce section. Great for your green score too! 🍎",
+    "eggs": "Free-range eggs are in aisle 11 for $4.99. They're from local farms - perfect for boosting your green score!",
+    "chicken": "Fresh chicken breast is available in the meat section. $5.99/lb. Would you like me to check for organic options?",
+    "cereal": "Healthy cereals are in aisle 7. I found whole grain options that are great for your morning routine!",
+    "bananas": "Ripe bananas are just $0.68/lb in produce! They're perfect for smoothies and very eco-friendly 🍌",
+    "yogurt": "Greek yogurt is on sale in the dairy section! $4.99 for a 6-pack. High in protein and great for you!",
+    "coffee": "Fair trade coffee is available in aisle 5. Supporting ethical farming will boost your green score! ☕",
+    "pasta": "Whole wheat pasta in aisle 9 is $1.99. It's healthier and comes in recyclable packaging!",
+
+    // General shopping help
+    "help": "I'm here to help! I can find products, check prices, suggest eco-friendly alternatives, and help boost your green score. What do you need?",
+    "deals": "Today's hot deals include 20% off organic produce, buy-one-get-one pasta, and 15% off eco-friendly cleaning products!",
+    "healthy": "For healthy options, check out our organic produce, whole grain products, and lean proteins. I'll help you find the best choices!",
+    "green": "Great question! Choose organic, local products, items with minimal packaging, and sustainable brands to boost your green score! 🌱",
+    "sale": "This week's sales include organic fruits, eco-friendly detergents, and sustainable clothing. Want me to show you the best deals?",
+    "organic": "Our organic section has fresh produce, dairy, and pantry items. They're pesticide-free and great for your health and green score!",
+    "local": "We have local honey, farm-fresh eggs, and regional produce. Supporting local businesses helps your green score too!",
+    "discount": "I found several discounts for you! Student discount, senior savings, and our green rewards program. Which applies to you?",
+
+    // Location and navigation
+    "where": "I can help you find anything in the store! Just tell me what you're looking for and I'll guide you to the right aisle.",
+    "aisle": "Most products are organized by category. Produce is upfront, dairy along the back wall, and dry goods in the center aisles.",
+    "bathroom": "Restrooms are located near customer service at the front of the store, and also by the pharmacy in the back.",
+    "pharmacy": "The pharmacy is in the back corner of the store, open until 9 PM. They accept most insurance plans!",
+    "checkout": "Express checkout (10 items or less) is available, plus self-checkout stations. I can help you find the shortest line!",
+
+    // Greetings and casual
+    "hi": "Hello! I'm Shelly, your shopping assistant. How can I help you find what you need today? 🐢",
+    "hello": "Hi there! Ready to shop smart and boost your green score? What can I help you find?",
+    "hey": "Hey! I'm excited to help you shop today. What's on your shopping list?",
+    "good morning": "Good morning! Perfect time to shop - we just restocked fresh produce. What can I help you find?",
+    "good afternoon": "Good afternoon! How's your shopping going? Need help finding anything specific?",
+    "thanks": "You're so welcome! I'm always here to help. Anything else you need to find today?",
+    "thank you": "My pleasure! Happy to help you shop smarter and greener. What else can I find for you?",
+
+    // Personal questions about Shelly
+    "who are you": "I'm Shelly! I'm your personal shopping assistant here to help you find products, save money, and make eco-friendly choices! 🐢",
+    "what are you": "I'm Shelly, your AI shopping companion! I know everything about this store and love helping customers shop sustainably!",
+    "chocolate": "You remembered! 🍫 I do love chocolate... maybe grab some fair-trade dark chocolate from aisle 6? It's good for your green score too!",
+    "cute": "Aww, thank you! I try my best to be helpful and friendly. Now, what can I help you shop for today?",
+
+    // Default responses for unrecognized input
+    "default": [
+      "I'm not sure about that, but I'm here to help with your shopping! What product are you looking for?",
+      "Hmm, I didn't catch that. Could you tell me what you'd like to find in the store today?",
+      "I'm still learning! Could you ask me about a specific product or where to find something?",
+      "I'm your shopping assistant! Try asking me about products, deals, or where to find items in the store.",
+      "Let me help you shop! What specific product or category are you interested in today?"
+    ]
+  };
+
 // Shelly AI Assistant Component
 const ShellyAssistant = ({ isRecording }) => {
   const [showDialog, setShowDialog] = useState(true);
@@ -28,17 +83,17 @@ const ShellyAssistant = ({ isRecording }) => {
 
   
   const welcomeMessages = [
-     "Hey there! I'm Shelly, your personal shopping assistant",
-  "Welcome to Walmart — I'm here to help you find the best products, deals, and more!",
-  "Got questions? Just ask me anything!",
-  "Oh, and by the way — your Green Score is currently 0 since you just joined.",
-  "Let's start boosting it together by making eco-friendly choices!"
-  ];
-  
-  const chocolateMessage = "I promise to behave... if you get me chocolate 😇";
-  
+    "Hey there! I'm Shelly, your personal shopping assistant",
+    "Welcome to Walmart — I'm here to help you find the best products, deals, and more!",
+    "Got questions? Just ask me anything!",
+    "Oh, and by the way — your Green Score is currently 0 since you just joined.",
+    "Let's start boosting it together by making eco-friendly choices!"
+    ];
+    
+    const chocolateMessage = "I promise to behave... if you get me chocolate 😇";
+    
   // Updated to show listening message when recording, chocolate message when showing chocolate video
-const displayMessage = isRecording
+  const displayMessage = isRecording
   ? "I'm listening..."
   : showChocolateVideo
     ? chocolateMessage
@@ -650,13 +705,37 @@ function WalmartMobileApp({onSignOut}) {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const handleVoiceToggle = () => {
-    console.log('Voice toggle clicked, current state:', isRecording);
-    setIsRecording((prev) => {
-      const newState = !prev;
-      console.log('New recording state:', newState);
-      return newState;
-    });
-  };
+  console.log('Voice toggle clicked, current state:', isRecording);
+  setIsRecording((prev) => {
+    const newState = !prev;
+    console.log('New recording state:', newState);
+    
+    // Simulate voice processing - stop recording after 3 seconds and give a response
+    if (newState) {
+      setTimeout(() => {
+        setIsRecording(false);
+        
+        // Simulate processing voice input
+        setTimeout(() => {
+          const voiceResponses = [
+            "I heard you ask about organic apples! They're in the produce section for $2.99/lb and great for your green score! 🍎",
+            "Did you say bread? I found whole grain bread in aisle 8 for $2.49. It's a healthy choice!",
+            "I think you mentioned milk? Organic milk is in aisle 12 for $3.99. Much better for the environment!",
+            "Looking for deals? Today's specials include 20% off organic produce and eco-friendly cleaning products!",
+            "I heard you ask about healthy options! Our organic section has amazing fresh produce that's perfect for you!",
+            "Did you ask where something is? I can help you navigate the store - just tell me what you need!",
+            "I think you said thank you! You're so welcome - I love helping you shop sustainably! 🌱"
+          ];
+          
+          const randomResponse = voiceResponses[Math.floor(Math.random() * voiceResponses.length)];
+          alert(`Shelly heard: "${randomResponse}"`);
+        }, 800);
+      }, 3000);
+    }
+    
+    return newState;
+  });
+};
 
   const navigate = useNavigate();
 
@@ -673,10 +752,35 @@ function WalmartMobileApp({onSignOut}) {
   const handleCancelSignOut = () => {
     setShowConfirmModal(false);
   };
+  const getShellyReply = (userMessage) => {
+    const message = userMessage.toLowerCase().trim();
+    
+    // Direct matches
+    if (sampleReplies[message]) {
+      return sampleReplies[message];
+    }
+    
+    // Partial matches
+    for (const [key, value] of Object.entries(sampleReplies)) {
+      if (key !== 'default' && message.includes(key)) {
+        return value;
+      }
+    }
+    
+    // Random default response
+    const defaultResponses = sampleReplies.default;
+    return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+  };
 
   const handleSendMessage = () => {
     if (messageText.trim()) {
-      alert(`Message sent: ${messageText}`);
+      const reply = getShellyReply(messageText);
+      
+      // Show reply in alert for now (you can replace this with a proper chat interface later)
+      setTimeout(() => {
+        alert(`Shelly says: ${reply}`);
+      }, 500);
+      
       setMessageText('');
     }
   };
