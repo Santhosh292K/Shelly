@@ -1,18 +1,202 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Search, Mic, Keyboard, Home, User, Settings, ScanLine, Leaf, Send, Coins, DollarSign } from 'lucide-react';
+import { Menu, Search, Mic, Keyboard, Home, User, Settings, ScanLine, Leaf, Send, Coins, DollarSign, Receipt, HelpCircle, QrCode, Palette, Tag, Gift } from 'lucide-react';
+
 import walmartLogo from '../assets/walmart_logo.png';
 import shellyWaveVideo from '../assets/shelly_wave.webm';
 import shellyCelebrateVideo from '../assets/shelly_wave.webm';
 import '../index.css';
 
+
+
+const HamburgerMenu = ({ isOpen, onClose, onNavigate, onSignOut }) => {
+  if (!isOpen) return null;
+  
+  const menuItems = [
+    { icon: Settings, label: 'Language | English', page: 'language' },
+    { icon: null, label: 'Walmart+', page: 'walmart-plus', isWalmart: true },
+    { icon: User, label: 'Account', page: 'account' },
+    { icon: Receipt, label: 'Purchase History', page: 'purchase-history' },
+    { icon: HelpCircle, label: 'Help', page: 'help' },
+    { icon: QrCode, label: 'Upload Bill', page: 'scanbill' },
+    { icon: Palette, label: 'Style Lab', page: 'style-lab' },
+    { icon: Tag, label: 'Offers', page: 'offers' },
+    { icon: Gift, label: 'My Rewards', page: 'rewards' },
+  ];
+  
+  const handleItemClick = (page) => {
+    onNavigate(page);
+    onClose();
+  };
+  
+  return (
+    <>
+      {/* Backdrop */}
+      <div 
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          zIndex: 50
+        }}
+        onClick={onClose}
+      />
+      
+      {/* Menu Panel */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '80%',
+        maxWidth: '288px',
+        height: '100%',
+        backgroundColor: 'white',
+        zIndex: 51,
+        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
+        display: 'flex',
+        flexDirection: 'column',
+        transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
+        transition: 'transform 0.3s ease-in-out'
+      }}>
+        {/* Menu Header */}
+        <div style={{
+          padding: '16px',
+          paddingBottom: '12px',
+          borderBottom: '1px solid #e5e7eb',
+          backgroundColor: 'white',
+          paddingTop: '24px'
+        }}>
+          <div style={{ marginBottom: '12px' }}>
+            <walmartLogo size={32} />
+          </div>
+          <button 
+            onClick={onSignOut}
+            style={{
+              width: '100%',
+              padding: '8px 16px',
+              backgroundColor: '#2563eb',
+              color: 'white',
+              border: 'none',
+              borderRadius: '20px',
+              fontSize: '14px',
+              fontWeight: '500',
+              cursor: 'pointer'
+            }}
+          >
+            Signout
+          </button>
+        </div>
+        
+        {/* Menu Items */}
+        <div style={{ flex: 1, paddingTop: '4px' }}>
+          {menuItems.map((item, index) => (
+            <div 
+              key={index}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '10px 16px',
+                cursor: 'pointer',
+                borderBottom: '1px solid #f3f4f6',
+                transition: 'background-color 0.2s'
+              }}
+              onClick={() => handleItemClick(item.page)}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+            >
+              {item.isWalmart ? (
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  color: '#2563eb',
+                  width: '16px',
+                  textAlign: 'center'
+                }}>
+                  W+
+                </div>
+              ) : item.icon ? (
+                <item.icon size={16} color="#666" />
+              ) : null}
+              <span style={{
+                marginLeft: '12px',
+                fontSize: '14px',
+                color: '#374151',
+                flex: 1
+              }}>
+                {item.label}
+              </span>
+              <span style={{
+                fontSize: '18px',
+                color: '#9ca3af',
+                marginLeft: 'auto'
+              }}>
+                ›
+              </span>
+            </div>
+          ))}
+          
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            paddingTop: '32px',
+            paddingBottom: '32px'
+          }}>
+            <button 
+              style={{
+                width: '60%',
+                padding: '6px 16px',
+                color: 'white',
+                border: 'none',
+                borderRadius: '20px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                background: 'linear-gradient(135deg, #4ade80, #22c55e, #319d55)',
+                boxShadow: '0 4px 12px rgba(34, 197, 94, 0.4)',
+                transition: 'all 0.3s ease-in-out',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+              onClick={() => handleItemClick('leaderboard')}
+            >
+              Leaderboard
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
 // Top Navigation Component
 const TopNavigation = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState('style-lab');
+
   const handleLogoClick = () => {
     alert('Walmart logo clicked!');
   };
 
   const handleScanClick = () => {
     alert('Scan to search clicked!');
+  };
+
+  const handleMenuToggle = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleMenuClose = () => {
+    setIsMenuOpen(false);
+  };
+
+  const handleNavigate = (page) => {
+    setCurrentPage(page);
+    alert(`Navigating to ${page}`);
+  };
+
+  const handleSignOut = () => {
+    alert('Signing out...');
   };
 
   const [goldCoins, setGoldCoins] = useState(150);
@@ -273,7 +457,7 @@ const TopNavigation = () => {
   return (
     <>
     <div style={topNavStyles.topNavBar}>
-      <button style={topNavStyles.hamburgerButton}>
+      <button style={topNavStyles.hamburgerButton} onClick={handleMenuToggle}>
         <Menu size={36} color="white" />
       </button>
 
@@ -305,6 +489,12 @@ const TopNavigation = () => {
         <span style={topNavStyles.scoreLabel}>Green score</span>
       </div>
     </div>
+    <HamburgerMenu 
+      isOpen={isMenuOpen}
+      onClose={handleMenuClose}
+      onNavigate={handleNavigate}
+      onSignOut={handleSignOut}
+    />
     <div style={mstyles.mainContent}>
       {/* Combined Gold Coin and Mascot Container */}
       <div style={mstyles.mascotArea}>
@@ -715,68 +905,54 @@ const mstyles = {
     objectFit: 'contain',
     marginLeft: '-170px',
   },
- dialogBox: {
+  dialogBox: {
     position: 'absolute',
-    bottom: '40px',
-    left: '190px',
-    width: '200px', // increased from 170px
-    backgroundColor: 'rgb(191, 219, 254, 0.2)',
-    borderRadius: '18px',
-    boxShadow: 'rgba(0, 0, 0, 0.1) 0px 10px 40px',
-    padding: '16px',
+    bottom: '30px',
+    left: '150px',
+    width: '170px',
+    backgroundColor: 'white',
+    borderRadius: '20px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+    padding: '12px 16px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '2px', // more spacing
-    zIndex: 10,
-    border: '2px solid rgb(132, 191, 246, 0.5)' // subtle top accent line
+    gap: '8px',
+    zIndex: 10
   },
-
   dialogHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center'
   },
-
   dialogTitle: {
     fontWeight: 'bold',
     color: '#0071ce',
-    fontSize: '14px',
-    textTransform: 'uppercase',
-    letterSpacing: '0.4px'
+    fontSize: '13px'
   },
-
   dialogCloseButton: {
-    backgroundColor: '#FF5F5F',
+    backgroundColor: 'rgb(247, 113, 113)',
     color: 'white',
     border: 'none',
-    borderRadius: '50%',
-    width: '20px',
-    height: '20px',
-    fontSize: '12px',
+    borderRadius: '150px',
+    fontSize: '10px',
+    width: '1px',
     cursor: 'pointer',
-    marginTop: '-50px',
-    marginRight: '-20px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
+    position: 'relative',
+    marginTop: '-23px',
+    marginRight: '-23px'
   },
-
   dialogBody: {
-    fontSize: '14px',
+    fontSize: '13px',
     fontWeight: '500',
-    color: '#334155',
-    lineHeight: '1.5'
+    color: '#334155'
   },
-
   dialogText: {
     margin: 0,
-    fontFamily: 'Arial, sans-serif'
+    fontFamily: 'Arial, sans-serif',
+    lineHeight: '1.4'
   },
-
   dialogIcon: {
-    fontSize: '22px',
-    alignSelf: 'center',
-    color: '#9CA3AF'
+    fontSize: '18px'
   },
   itemsPalette: {
     flex: 1, // Take remaining space
