@@ -13,6 +13,8 @@ import shelly_wave from '../assets/shelly_wave.webm';
 import shelly_listens from '../assets/shelly_listens.webm'
 import shelly_rotate from '../assets/shelly_rotate.webm'
 import shelly_chocolate from '../assets/shelly_chocolate.webm'
+import shelly_sad from '../assets/shelly_sad.webm'
+import wave_plain from '../assets/wave_plain.webm'
 
 // Shelly AI Assistant Component
 const ShellyAssistant = ({ isRecording, replyMessage, showReply }) => {
@@ -156,7 +158,7 @@ useEffect(() => {
     if (showChocolateVideo) {
       return shelly_chocolate;
     }
-    return currentVideo === 'wave' ? shelly_wave : shelly_rotate;
+    return currentVideo === 'wave' ? wave_plain : shelly_rotate;
   };
 
   return (
@@ -522,13 +524,17 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
       <div className="fixed inset-0 bg-black bg-opacity-50 z-[50] flex items-center justify-center">
         <div className="bg-white rounded-2xl p-4 mb-31 mr-24 max-w-xs w-full shadow-2xl transform transition-all duration-300 ease-out">
           {/* Shelly the Tortoise */}
-          <div className="flex justify-center mb-4">
-            <img 
-              src={shelly_img} 
-              alt="Shelly the Tortoise"
-              className="w-16 h-16 rounded-full object-cover"
-            />
-          </div>
+         <div className="flex justify-center mb-4">
+  <video 
+    src={shelly_sad} 
+    autoPlay 
+    loop 
+    muted 
+    playsInline
+    className="w-20 h-20 rounded-full object-cover"
+  />
+</div>
+
 
           {/* Message */}
           <div className="bg-white rounded-xl p-2 w-[280px] mx-auto text-center">
@@ -562,7 +568,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
 // Hamburger Menu Component
 const HamburgerMenu = ({ isOpen, onClose, onNavigate, onSignOut }) => {
   if (!isOpen) return null;
-
+  const navigate = useNavigate();
   const menuItems = [
     { icon: Settings, label: 'Language | English', page: 'language' },
     { icon: null, label: 'Walmart+', page: 'walmart-plus', isWalmart: true },
@@ -623,7 +629,9 @@ const HamburgerMenu = ({ isOpen, onClose, onNavigate, onSignOut }) => {
           <div className="flex justify-center py-8">
             <button 
               className="leaderboard-button w-3/5 py-1.5 px-4 text-white border-none rounded-full text-sm font-semibold cursor-pointer relative overflow-hidden shadow-lg"
-              onClick={() => handleItemClick('leaderboard')}
+              onClick={() => {
+                navigate('/leaderboard');
+              }}
             >
               Leaderboard
             </button>
@@ -757,6 +765,10 @@ function WalmartMobileApp({onSignOut}) {
     }
      if (page === 'stylelab') {
       navigate('/stylelab'); // ✅ real page navigation
+      return;
+    }
+    if (page === 'leaderboard') {
+      navigate('/leaderboard'); // ✅ real page navigation
       return;
     }
     setCurrentPage(page);
