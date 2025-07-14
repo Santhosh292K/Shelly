@@ -255,7 +255,7 @@ const ShellyLeaderboard = () => {
 
       {/* Shelly Motivation */}
       <div className="mt-6 bg-gradient-to-r from-green-400 to-blue-500 rounded-2xl p-6 text-white text-center">
-        <div className="text-4xl mb-2">🐢</div>
+    
         <h3 className="text-xl font-bold mb-2">Keep up the great work!</h3>
         <p className="text-green-100">Every sustainable choice you make helps our planet. Shelly is proud of our eco-community!</p>
       </div>
