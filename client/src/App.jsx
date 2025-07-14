@@ -5,6 +5,7 @@ import WalmartMobileApp from './pages/main_page';
 import ScanBill from './pages/ScanBillPage';
 import ScanProduct from './pages/ScanProductPage';
 import PersonalizationPage from './pages/personalization';
+import ShellyLeaderboard from './pages/leaderboard';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -73,6 +74,8 @@ export default function App() {
             <Route path="/" element={<Navigate to={isAuthenticated ? "/app" : "/registration"} />} />
             <Route path="/scanproduct" element={<ScanProduct />} />
             <Route path="/scanbill" element={<ScanBill />} />
+            <Route path="/leaderboard" element={<ShellyLeaderboard />} />
+
           </Routes>
         </div>
       </div>
