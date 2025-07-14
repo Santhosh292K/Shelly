@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, Search, Mic, Keyboard, Home, User, Settings, ScanLine, Leaf, Send, Coins, DollarSign } from 'lucide-react';
-import walmartLogo from './assets/walmart_logo.png';
-import shellyWaveVideo from './assets/shelly_wave.webm';
-import shellyCelebrateVideo from './assets/shelly_wave.webm';
-import './index.css';
+import walmartLogo from '../assets/walmart_logo.png';
+import shellyWaveVideo from '../assets/shelly_wave.webm';
+import shellyCelebrateVideo from '../assets/shelly_wave.webm';
+import '../index.css';
 
 // Top Navigation Component
 const TopNavigation = () => {
@@ -715,54 +715,68 @@ const mstyles = {
     objectFit: 'contain',
     marginLeft: '-170px',
   },
-  dialogBox: {
+ dialogBox: {
     position: 'absolute',
-    bottom: '30px',
-    left: '150px',
-    width: '170px',
-    backgroundColor: 'white',
-    borderRadius: '20px',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-    padding: '12px 16px',
+    bottom: '40px',
+    left: '190px',
+    width: '200px', // increased from 170px
+    backgroundColor: 'rgb(191, 219, 254, 0.2)',
+    borderRadius: '18px',
+    boxShadow: 'rgba(0, 0, 0, 0.1) 0px 10px 40px',
+    padding: '16px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
-    zIndex: 10
+    gap: '2px', // more spacing
+    zIndex: 10,
+    border: '2px solid rgb(132, 191, 246, 0.5)' // subtle top accent line
   },
+
   dialogHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center'
   },
+
   dialogTitle: {
     fontWeight: 'bold',
     color: '#0071ce',
-    fontSize: '13px'
+    fontSize: '14px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.4px'
   },
+
   dialogCloseButton: {
-    backgroundColor: 'rgb(247, 113, 113)',
+    backgroundColor: '#FF5F5F',
     color: 'white',
     border: 'none',
-    borderRadius: '150px',
-    fontSize: '10px',
-    width: '1px',
+    borderRadius: '50%',
+    width: '20px',
+    height: '20px',
+    fontSize: '12px',
     cursor: 'pointer',
-    position: 'relative',
-    marginTop: '-23px',
-    marginRight: '-23px'
+    marginTop: '-50px',
+    marginRight: '-20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
+
   dialogBody: {
-    fontSize: '13px',
+    fontSize: '14px',
     fontWeight: '500',
-    color: '#334155'
+    color: '#334155',
+    lineHeight: '1.5'
   },
+
   dialogText: {
     margin: 0,
-    fontFamily: 'Arial, sans-serif',
-    lineHeight: '1.4'
+    fontFamily: 'Arial, sans-serif'
   },
+
   dialogIcon: {
-    fontSize: '18px'
+    fontSize: '22px',
+    alignSelf: 'center',
+    color: '#9CA3AF'
   },
   itemsPalette: {
     flex: 1, // Take remaining space
