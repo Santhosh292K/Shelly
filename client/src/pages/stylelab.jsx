@@ -4,8 +4,11 @@ import { Menu, Search, Mic, Keyboard, Home, User, Settings, ScanLine, Leaf, Send
 // Import your assets - keeping your original paths
 import walmartLogo from '../assets/walmart_logo.png';
 import shellyWaveVideo from '../assets/shelly_wave.webm';
-import shellyCelebrateVideo from '../assets/shelly_wave.webm';
-import shelly_sad from '../assets/shelly_sad.webm'; // Added missing import
+import shellyWave from '../assets/shelly_wave.webm';
+import shellyHatWave from '../assets/shelly_hat_wave.webm';
+import shellyHatMaskWave from '../assets/shelly_hat_mask_waving.webm';
+import shellyHat from '../assets/shelly_hat_wave.webm';
+
 import '../index.css';
 import './main_page.jsx'
 
@@ -275,8 +278,9 @@ function StyleLabPage() {
       name: 'Christmas Hat',
       type: 'cap',
       cost: 55,
-      imageUrl: '/src/assets/christmas_hat.png',
-      fallbackColor: '#eab308'
+      imageUrl: '/src/assets/santa_hat.png',
+      fallbackColor: '#16a34a'
+
     },
     {
       id: 'purple-cap',
@@ -394,24 +398,29 @@ function StyleLabPage() {
   };
 
   const handleEquipItem = (item) => {
-    setSelectedItems(prev => ({
-      ...prev,
+    const newSelection = {
+      ...selectedItems,
       [item.type]: item.id
-    }));
-    setMascotVideo(shellyWaveVideo);
+    };
+
+    const transitionVideo = getTransitionVideo(selectedItems, newSelection);
+    setSelectedItems(newSelection);
+    setMascotVideo(transitionVideo);
+
     showMessageWithTimeout(`Ooooh! This ${item.name} looks awesome on me! 💅`);
   };
 
   const handleUnequipItem = (item) => {
-    setSelectedItems(prev => ({
-      ...prev,
+    const newSelection = {
+      ...selectedItems,
       [item.type]: null
-    }));
-    showMessageWithTimeout(
-      "Oh no! Don't leave me plain... dress me up again! 😭",
-      5000,
-      stylingTips[Math.floor(Math.random() * stylingTips.length)]
-    );
+    };
+
+    const transitionVideo = getTransitionVideo(selectedItems, newSelection);
+    setSelectedItems(newSelection);
+    setMascotVideo(transitionVideo);
+    showMessageWithTimeout("Oh no! Don’t leave me plain... dress me up again! 😭");
+
     startDialogCycle();
   };
 
@@ -421,7 +430,9 @@ function StyleLabPage() {
       setGoldCoins(prev => prev - item.cost);
       setPurchasedItems(prev => new Set([...prev, item.id]));
 
-      setMascotVideo(shellyCelebrateVideo);
+      // Happy animation
+      setMascotVideo(shellyWaveVideo);
+
       showMessageWithTimeout(
         `Wooohoo! Thanks for buying the ${item.name} for me! 🛍️🥰`,
         5000,
@@ -438,6 +449,27 @@ function StyleLabPage() {
     return Object.values(selectedItems).includes(itemId);
   };
 
+  const getTransitionVideo = (prevState, newState) => {
+    const hadHat = prevState.cap !== null;
+    const hadMask = prevState.eyeMask !== null;
+    const hasHat = newState.cap !== null;
+    const hasMask = newState.eyeMask !== null;
+
+    // Equipping hat
+    if (!hadHat && hasHat && !hasMask) return shellyHatWave;
+    
+    // Equipping mask (when hat already equipped)
+    if (hadHat && !hadMask && hasMask) return shellyHatMaskWave;
+
+    // Unequipping mask (hat still equipped)
+    if (hadHat && hadMask && !hasMask) return shellyHat;
+
+    // Unequipping hat (mask already removed)
+    if (hadHat && !hasMask && !hasHat) return shellyWave;
+
+    return shellyWave;
+  };
+
   const getItemsByType = (type) => {
     return customizationItems.filter(item => item.type === type);
   };
@@ -452,18 +484,32 @@ function StyleLabPage() {
     return titles[type] || type;
   };
 
-  const handleMenuToggle = () => {
-    setIsMenuOpen(!isMenuOpen);
+  const startDialogCycle = () => {
+    if (dialogCloseTimer) clearTimeout(dialogCloseTimer);
+
+    const timeout = setTimeout(() => {
+      const randomTip = stylingTips[Math.floor(Math.random() * stylingTips.length)];
+      setMascotMessage(randomTip);
+      setShowDialog(true);
+    }, 5000); // ⏱️ wait 7 seconds
+
+    setDialogCloseTimer(timeout);
   };
 
-  const handleLogoClick = () => {
-    console.log('Logo clicked - navigate to home');
-  };
+  const [showDialog, setShowDialog] = useState(true);
+  const [mascotMessage, setMascotMessage] = useState("Hey there! Style me up—I want to look fabulous! 💅");
+  const [mascotVideo, setMascotVideo] = useState(shellyWaveVideo);
+  const [initialDialogShown, setInitialDialogShown] = useState(false);
+  const [dialogCloseTimer, setDialogCloseTimer] = useState(null);
 
-  const handleSignOut = () => {
-    setShowSignOutModal(true);
-    setIsMenuOpen(false);
-  };
+  const stylingTips = [
+    "Let's try the cowboy hat—it’s wild west vibes! 🤠",
+    "Sunglasses make everything cooler 😎",
+    "Dress me in something festive! 🎉",
+    "Mix and match accessories! 🎨",
+    "I love hoodies, they are super comfy! 🧥"
+  ];
+
 
   const handleConfirmSignOut = () => {
     setShowSignOutModal(false);
@@ -539,22 +585,32 @@ function StyleLabPage() {
               playsInline
               style={mstyles.mascotVideo}
             />
-            
-            {/* Dialog Box */}
-            {showDialog && (
-              <div style={mstyles.dialogBox}>
-                <div style={mstyles.dialogHeader}>
-                  <span style={mstyles.dialogTitle}>Shelly 🐢</span>
-                  <button 
-                    style={mstyles.dialogCloseButton}
-                    onClick={() => setShowDialog(false)}
-                  >
-                    ✕
-                  </button>
-                </div>
-                <div style={mstyles.dialogBody}>
-                  <p style={mstyles.dialogText}>{mascotMessage}</p>
-                </div>
+          </div>
+          {showDialog && (
+            <div style={mstyles.dialogBox}>
+              <div style={mstyles.dialogHeader}>
+                <span style={mstyles.greenDot}></span>
+                <span style={mstyles.dialogTitle}>SHELLY SAYS</span>
+                <button
+                  onClick={() => {
+                    setShowDialog(false);
+
+                    if (dialogCloseTimer) clearTimeout(dialogCloseTimer);
+
+                    const timeout = setTimeout(() => {
+                      const randomTip = stylingTips[Math.floor(Math.random() * stylingTips.length)];
+                      setMascotMessage(randomTip);
+                      setShowDialog(true);
+                    }, 7000); // ⏱️ wait 7 sec before showing again
+                    setDialogCloseTimer(timeout);
+                  }}
+                  style={mstyles.dialogCloseButton}
+                >x</button>
+              </div>
+
+              <div style={mstyles.dialogBody}>
+                <p style={mstyles.dialogText}>{mascotMessage}</p>
+
               </div>
             )}
           </div>
@@ -609,17 +665,20 @@ function StyleLabPage() {
                               e.target.nextSibling.style.display = 'flex';
                             }}
                           />
-                          <div 
-                            style={{
-                              ...mstyles.itemIcon,
-                              backgroundColor: item.fallbackColor,
-                              display: 'none'
-                            }}
-                          >
-                            {item.type === 'cap' && '🎩'}
-                            {item.type === 'eyeMask' && '🥷'}
-                            {item.type === 'accessory' && '👓'}
-                            {item.type === 'shirt' && '👕'}
+                          {/* Fallback colv - always present but hidden when image loads */}
+                          <div style={{
+                            backgroundColor: item.fallbackColor,
+                            display: 'flex' // Initially visible, hidden when image loads
+                          }}>
+                              <img
+                              src={item.imageUrl}
+                              alt={item.name}
+                              style={mstyles.itemImage}
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                              }}
+                            />
+
                           </div>
                         </div>
                         
@@ -803,16 +862,16 @@ const mstyles = {
   dialogBox: {
     position: 'absolute',
     bottom: '30px',
-    left: '150px',
+    left: '190px',
     width: '170px',
-    backgroundColor: 'white',
+    backgroundColor: '#dbeafe7f',
     borderRadius: '20px',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 7px 20px rgba(0, 0, 0, 0.5)',
     padding: '12px 16px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
-    zIndex: 10
+    zIndex: 10,
+    border: '2px solid rgb(59, 130, 246, 0.4)'
   },
   dialogHeader: {
     display: 'flex',
@@ -830,10 +889,10 @@ const mstyles = {
     border: 'none',
     borderRadius: '150px',
     fontSize: '10px',
-    width: '1px',
+    width: '15px',
     cursor: 'pointer',
     position: 'relative',
-    marginTop: '-23px',
+    marginTop: '-40px',
     marginRight: '-23px'
   },
   dialogBody: {
