@@ -3,7 +3,10 @@ import { Menu, Search, Mic, Keyboard, Home, User, Settings, ScanLine, Leaf, Send
 
 import walmartLogo from '../assets/walmart_logo.png';
 import shellyWaveVideo from '../assets/shelly_wave.webm';
-import shellyCelebrateVideo from '../assets/shelly_wave.webm';
+import shellyWave from '../assets/shelly_wave.webm';
+import shellyHatWave from '../assets/shelly_hat_wave.webm';
+import shellyHatMaskWave from '../assets/shelly_hat_mask_waving.webm';
+import shellyHat from '../assets/shelly_hat_wave.webm';
 import '../index.css';
 
 
@@ -240,7 +243,7 @@ const TopNavigation = () => {
       name: 'Chritmas Hat',
       type: 'cap',
       cost: 55,
-      imageUrl: '/src/assets/ninja_turtle_eye_mask.png',
+      imageUrl: '/src/assets/santa_hat.png',
       fallbackColor: '#16a34a'
     },
     {
@@ -328,24 +331,27 @@ const TopNavigation = () => {
   ];
 
   const handleEquipItem = (item) => {
-    setSelectedItems(prev => ({
-      ...prev,
+    const newSelection = {
+      ...selectedItems,
       [item.type]: item.id
-    }));
-    setMascotVideo(shellyWaveVideo); // Ensure correct video stays
+    };
+
+    const transitionVideo = getTransitionVideo(selectedItems, newSelection);
+    setSelectedItems(newSelection);
+    setMascotVideo(transitionVideo);
     showMessageWithTimeout(`Ooooh! This ${item.name} looks awesome on me! 💅`);
   };
 
   const handleUnequipItem = (item) => {
-    setSelectedItems(prev => ({
-      ...prev,
+    const newSelection = {
+      ...selectedItems,
       [item.type]: null
-    }));
-    showMessageWithTimeout(
-      "Oh no! Don’t leave me plain... dress me up again! 😭",
-      5000,
-      stylingTips[Math.floor(Math.random() * stylingTips.length)]
-    );
+    };
+
+    const transitionVideo = getTransitionVideo(selectedItems, newSelection);
+    setSelectedItems(newSelection);
+    setMascotVideo(transitionVideo);
+    showMessageWithTimeout("Oh no! Don’t leave me plain... dress me up again! 😭");
     startDialogCycle();
   };
 
@@ -356,7 +362,7 @@ const TopNavigation = () => {
       setPurchasedItems(prev => new Set([...prev, item.id]));
 
       // Happy animation
-      setMascotVideo('/assets/shelly_wave.webm');
+      setMascotVideo(shellyWaveVideo);
       showMessageWithTimeout(
         `Wooohoo! Thanks for buying the ${item.name} for me! 🛍️🥰`,
         5000,
@@ -371,6 +377,27 @@ const TopNavigation = () => {
 
   const isItemEquipped = (itemId) => {
     return Object.values(selectedItems).includes(itemId);
+  };
+
+  const getTransitionVideo = (prevState, newState) => {
+    const hadHat = prevState.cap !== null;
+    const hadMask = prevState.eyeMask !== null;
+    const hasHat = newState.cap !== null;
+    const hasMask = newState.eyeMask !== null;
+
+    // Equipping hat
+    if (!hadHat && hasHat && !hasMask) return shellyHatWave;
+    
+    // Equipping mask (when hat already equipped)
+    if (hadHat && !hadMask && hasMask) return shellyHatMaskWave;
+
+    // Unequipping mask (hat still equipped)
+    if (hadHat && hadMask && !hasMask) return shellyHat;
+
+    // Unequipping hat (mask already removed)
+    if (hadHat && !hasMask && !hasHat) return shellyWave;
+
+    return shellyWave;
   };
 
   const getItemsByType = (type) => {
@@ -394,11 +421,10 @@ const TopNavigation = () => {
       const randomTip = stylingTips[Math.floor(Math.random() * stylingTips.length)];
       setMascotMessage(randomTip);
       setShowDialog(true);
-    }, 7000); // ⏱️ wait 7 seconds
+    }, 5000); // ⏱️ wait 7 seconds
 
     setDialogCloseTimer(timeout);
   };
-
 
   const [showDialog, setShowDialog] = useState(true);
   const [mascotMessage, setMascotMessage] = useState("Hey there! Style me up—I want to look fabulous! 💅");
@@ -532,7 +558,6 @@ const TopNavigation = () => {
                       setMascotMessage(randomTip);
                       setShowDialog(true);
                     }, 7000); // ⏱️ wait 7 sec before showing again
-                    startDialogCycle();
                     setDialogCloseTimer(timeout);
                   }}
                   style={mstyles.dialogCloseButton}
@@ -586,7 +611,7 @@ const TopNavigation = () => {
                               }
                             }}
                           />
-                          {/* Fallback colored div - always present but hidden when image loads */}
+                          {/* Fallback colv - always present but hidden when image loads */}
                           <div style={{
                             backgroundColor: item.fallbackColor,
                             display: 'flex' // Initially visible, hidden when image loads
@@ -908,16 +933,16 @@ const mstyles = {
   dialogBox: {
     position: 'absolute',
     bottom: '30px',
-    left: '150px',
+    left: '190px',
     width: '170px',
-    backgroundColor: 'white',
+    backgroundColor: '#dbeafe7f',
     borderRadius: '20px',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 7px 20px rgba(0, 0, 0, 0.5)',
     padding: '12px 16px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
-    zIndex: 10
+    zIndex: 10,
+    border: '2px solid rgb(59, 130, 246, 0.4)'
   },
   dialogHeader: {
     display: 'flex',
@@ -935,10 +960,10 @@ const mstyles = {
     border: 'none',
     borderRadius: '150px',
     fontSize: '10px',
-    width: '1px',
+    width: '15px',
     cursor: 'pointer',
     position: 'relative',
-    marginTop: '-23px',
+    marginTop: '-40px',
     marginRight: '-23px'
   },
   dialogBody: {
