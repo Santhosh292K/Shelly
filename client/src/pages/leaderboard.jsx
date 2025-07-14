@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Trophy, Medal, Award, Leaf, Star, TrendingUp, Zap, Heart, ShoppingCart } from 'lucide-react';
-
+import { Trophy, Medal, Award, Leaf, Star, TrendingUp, Zap, Heart, ShoppingCart, ArrowLeft } from 'lucide-react';
+import { useNavigate} from 'react-router-dom';
 const ShellyLeaderboard = () => {
   const [activeTab, setActiveTab] = useState('monthly');
-  
+  const navigate = useNavigate();
   const currentUser = {
     name: 'Sparky',
     greenScore: 0,
@@ -55,8 +55,26 @@ const ShellyLeaderboard = () => {
     }
   };
 
+  const handleBackClick = () => {
+    navigate(-1);
+  };
+
   return (
-    <div className="max-w-4xl mx-auto p-4 bg-gradient-to-br from-green-50 to-blue-50 min-h-screen">
+    <div className="max-w-4xl mx-auto bg-gradient-to-br from-green-50 to-blue-50 min-h-screen">
+      {/* App Bar */}
+      <div className={`bg-blue-600 text-white sticky top-0 z-50 shadow-lg transition-all duration-300 `}>
+        <div className="px-4 py-3">
+          <div className="flex items-center">
+            <button
+              onClick={handleBackClick}
+              className="p-2 -ml-2 mr-3 rounded-full hover:bg-blue-700 transition-colors"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+            <h1 className="text-xl font-semibold">LeaderBoard</h1>
+          </div>
+        </div>
+      </div>
       {/* Header */}
       <div className="bg-white rounded-2xl shadow-lg mb-6 p-4 border-2 border-green-200">
         <div className="flex items-center justify-between">
