@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect} from 'react';
 import { Camera, Leaf, ShoppingCart, AlertCircle, Recycle, TrendingDown, Star, Receipt, ArrowLeft } from 'lucide-react';
 import { Heart, Share2, Info, Award, BarChart3, Factory, Droplets, Zap, Trash2, RotateCcw, MapPin, Clock } from 'lucide-react';
+import shelly_wave from '../assets/shelly_wave.webm';
+
 const ScanProduct = () => {
   const navigate = (direction) => {
     if (direction === -1) {
@@ -21,6 +23,11 @@ const ScanProduct = () => {
   const streamRef = useRef(null);
   const scanningIntervalRef = useRef(null);
   const fallbackTimeoutRef = useRef(null);
+  const [showMessage, setShowMessage] = useState(true);
+  const [messageContent, setMessageContent] = useState({
+    text: "Scan the products before you buy!",
+    type: 'welcome'
+  });
 
   // Mock product database with carbon footprint data
   const mockProducts = {
@@ -423,6 +430,7 @@ const ScanProduct = () => {
       fetchProductData(scannedCode.trim());
     }
   };
+  
 
   // Cleanup on unmount
   useEffect(() => {
@@ -439,6 +447,15 @@ const ScanProduct = () => {
     };
   }, []);
   
+  const getVideoSource = () => {
+    return shelly_wave; // Using the imported video
+  };
+
+  const handleScreenTap = () => {
+    if (showMessage) {
+      setShowMessage(false);
+    }
+  };
 
   const getCarbonRatingColor = (rating) => {
     switch (rating?.toLowerCase()) {
@@ -503,12 +520,21 @@ const ScanProduct = () => {
         </div>
       </div>
     </div>
+    
   );
   // Main scanner view
   if (!productData && !loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        {/* Header */}
+      <>
+    <div className="min-h-screen bg-gray-50 flex flex-col relative"> 
+      {/* Blur overlay when message is shown */}
+{showMessage && (
+  <div 
+    className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30"
+    onClick={handleScreenTap}
+  />
+)}  
+      {/* Header */}
         <div className="bg-blue-600 px-6 py-4">
           <div className="flex items-center gap-3">
             <button
@@ -705,6 +731,39 @@ const ScanProduct = () => {
           </div>
         )}
       </div>
+          {/* Fixed Video Assistant in Bottom Right Corner */}
+<div className="fixed bottom-4 right-2 z-50">
+  <div className="w-40 h-56 rounded-lg overflow-hidden">
+    <video 
+      src={getVideoSource()} 
+      autoPlay 
+      loop 
+      muted 
+      playsInline 
+      className="w-full h-full object-cover" 
+    />
+  </div>
+</div>
+
+{/* Message Box */}
+{showMessage && (
+  <div className="fixed bottom-24 right-40 z-50 max-w-xs">
+    <div className="bg-white rounded-2xl shadow-xl p-4 relative border-2 border-blue-200">
+      {/* Speech bubble tail */}
+      <div className="absolute -right-2 bottom-8 w-0 h-0 border-l-8 border-l-white border-t-8 border-t-transparent border-b-8 border-b-transparent"></div>
+      <div className="absolute -right-3 bottom-8 w-0 h-0 border-l-8 border-l-blue-200 border-t-8 border-t-transparent border-b-8 border-b-transparent"></div>
+      <div className="text-sm text-gray-800 font-medium leading-relaxed">
+        {messageContent.text}
+      </div>
+      {messageContent.type === 'welcome' && (
+        <div className="mt-2 text-xs text-blue-600 animate-pulse">
+          Tap anywhere to continue
+        </div>
+      )}
+    </div>
+  </div>
+)}
+</>
     );
   }
 
@@ -722,8 +781,15 @@ const ScanProduct = () => {
 
   // Product results view
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
+    <>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative">
+      {/* Blur overlay when message is shown */}
+      {showMessage && (
+        <div 
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30"
+          onClick={handleScreenTap}
+      />
+      )}      {/* Header */}
       <div className="bg-blue shadow-sm border-b border-gray-200">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
@@ -1047,7 +1113,41 @@ const ScanProduct = () => {
           </div>
         )}
       </div>
+     
     </div>
+     {/* Fixed Video Assistant in Bottom Right Corner */}
+<div className="fixed bottom-4 right-2 z-50">
+  <div className="w-40 h-56 rounded-lg overflow-hidden">
+    <video 
+      src={getVideoSource()} 
+      autoPlay 
+      loop 
+      muted 
+      playsInline 
+      className="w-full h-full object-cover" 
+    />
+  </div>
+</div>
+
+{/* Message Box */}
+{showMessage && (
+  <div className="fixed bottom-24 right-40 z-50 max-w-xs">
+    <div className="bg-white rounded-2xl shadow-xl p-4 relative border-2 border-blue-200">
+      {/* Speech bubble tail */}
+      <div className="absolute -right-2 bottom-8 w-0 h-0 border-l-8 border-l-white border-t-8 border-t-transparent border-b-8 border-b-transparent"></div>
+      <div className="absolute -right-3 bottom-8 w-0 h-0 border-l-8 border-l-blue-200 border-t-8 border-t-transparent border-b-8 border-b-transparent"></div>
+      <div className="text-sm text-gray-800 font-medium leading-relaxed">
+        {messageContent.text}
+      </div>
+      {messageContent.type === 'welcome' && (
+        <div className="mt-2 text-xs text-blue-600 animate-pulse">
+          Tap anywhere to continue
+        </div>
+      )}
+    </div>
+  </div>
+)}
+    </>
   );
 };
 
