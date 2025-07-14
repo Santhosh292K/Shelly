@@ -562,7 +562,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
 // Hamburger Menu Component
 const HamburgerMenu = ({ isOpen, onClose, onNavigate, onSignOut }) => {
   if (!isOpen) return null;
-
+  const navigate = useNavigate();
   const menuItems = [
     { icon: Settings, label: 'Language | English', page: 'language' },
     { icon: null, label: 'Walmart+', page: 'walmart-plus', isWalmart: true },
@@ -623,7 +623,9 @@ const HamburgerMenu = ({ isOpen, onClose, onNavigate, onSignOut }) => {
           <div className="flex justify-center py-8">
             <button 
               className="leaderboard-button w-3/5 py-1.5 px-4 text-white border-none rounded-full text-sm font-semibold cursor-pointer relative overflow-hidden shadow-lg"
-              onClick={() => handleItemClick('leaderboard')}
+              onClick={() => {
+                navigate('/leaderboard');
+              }}
             >
               Leaderboard
             </button>
@@ -757,6 +759,10 @@ function WalmartMobileApp({onSignOut}) {
     }
      if (page === 'stylelab') {
       navigate('/stylelab'); // ✅ real page navigation
+      return;
+    }
+    if (page === 'leaderboard') {
+      navigate('/leaderboard'); // ✅ real page navigation
       return;
     }
     setCurrentPage(page);
