@@ -1129,52 +1129,101 @@ const ScanProduct = () => {
       </div>
      
     </div>
-    <div className='relative z-50'>
-        <Draggable axis='y'>
-        <div>
-          {/* Fixed Video Assistant in Bottom Right Corner */}
-          <div className="fixed bottom-4 right-2 z-50">
-            <div className="w-40 h-56 rounded-lg overflow-hidden">
-              <video
-                src={getVideoSource()}
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full h-full object-cover"
-              />
+    // Replace the video assistant section at the bottom of your component with this:
+
+<div className='relative z-50'>
+  {/* Only make it draggable when NOT in product view */}
+  {!productData ? (
+    <Draggable axis='y'>
+      <div>
+        {/* Fixed Video Assistant in Bottom Right Corner */}
+        <div className="fixed bottom-4 right-2 z-50">
+          <div className="w-40 h-56 rounded-lg overflow-hidden">
+            <video
+              src={getVideoSource()}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+
+        {/* Message Box */}
+        {showMessage && (
+          <div className="fixed bottom-24 right-40 z-50 max-w-xs">
+            <div className="bg-white rounded-2xl shadow-xl p-4 relative border-2 border-blue-200">
+              {/* Speech bubble tail */}
+              <div className="absolute -right-2 bottom-8 w-0 h-0 border-l-8 border-l-white border-t-8 border-t-transparent border-b-8 border-b-transparent"></div>
+              <div className="absolute -right-3 bottom-8 w-0 h-0 border-l-8 border-l-blue-200 border-t-8 border-t-transparent border-b-8 border-b-transparent"></div>
+              
+              <div className="text-sm text-gray-800 font-medium leading-relaxed">
+                {messageContent.text}
+              </div>
+              
+              {messageContent.type === 'welcome' && (
+                <div className="mt-2 text-xs text-blue-600 animate-pulse">
+                  Tap anywhere to continue
+                </div>
+              )}
+              
+              {messageContent.type === 'comment' && (
+                <div className="mt-2 text-xs text-green-600 animate-pulse">
+                  Tap to dismiss
+                </div>
+              )}
             </div>
           </div>
-
-          {/* Message Box */}
-          {showMessage && (
-            <div className="fixed bottom-24 right-40 z-50 max-w-xs">
-              <div className="bg-white rounded-2xl shadow-xl p-4 relative border-2 border-blue-200">
-                {/* Speech bubble tail */}
-                <div className="absolute -right-2 bottom-8 w-0 h-0 border-l-8 border-l-white border-t-8 border-t-transparent border-b-8 border-b-transparent"></div>
-                <div className="absolute -right-3 bottom-8 w-0 h-0 border-l-8 border-l-blue-200 border-t-8 border-t-transparent border-b-8 border-b-transparent"></div>
-                
-                <div className="text-sm text-gray-800 font-medium leading-relaxed">
-                  {messageContent.text}
-                </div>
-                
-                {messageContent.type === 'welcome' && (
-                  <div className="mt-2 text-xs text-blue-600 animate-pulse">
-                    Tap anywhere to continue
-                  </div>
-                )}
-                
-                {messageContent.type === 'comment' && (
-                  <div className="mt-2 text-xs text-green-600 animate-pulse">
-                    Tap to dismiss
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      </Draggable>
+        )}
       </div>
+    </Draggable>
+  ) : (
+    // Fixed position for product page - no dragging
+    <div>
+      {/* Fixed Video Assistant in Bottom Right Corner - stays in viewport */}
+      <div className="fixed bottom-4 right-2 z-50" style={{ position: 'fixed' }}>
+        <div className="w-40 h-56 rounded-lg overflow-hidden">
+          <video
+            src={getVideoSource()}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+
+      {/* Message Box */}
+      {showMessage && (
+        <div className="fixed bottom-24 right-40 z-50 max-w-xs" style={{ position: 'fixed' }}>
+          <div className="bg-white rounded-2xl shadow-xl p-4 relative border-2 border-blue-200">
+            {/* Speech bubble tail */}
+            <div className="absolute -right-2 bottom-8 w-0 h-0 border-l-8 border-l-white border-t-8 border-t-transparent border-b-8 border-b-transparent"></div>
+            <div className="absolute -right-3 bottom-8 w-0 h-0 border-l-8 border-l-blue-200 border-t-8 border-t-transparent border-b-8 border-b-transparent"></div>
+            
+            <div className="text-sm text-gray-800 font-medium leading-relaxed">
+              {messageContent.text}
+            </div>
+            
+            {messageContent.type === 'welcome' && (
+              <div className="mt-2 text-xs text-blue-600 animate-pulse">
+                Tap anywhere to continue
+              </div>
+            )}
+            
+            {messageContent.type === 'comment' && (
+              <div className="mt-2 text-xs text-green-600 animate-pulse">
+                Tap to dismiss
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )}
+</div>
     </>
   );
 };
