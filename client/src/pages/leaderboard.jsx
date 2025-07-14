@@ -115,7 +115,7 @@ const ShellyLeaderboard = () => {
             const positions = [1, 0, 2]; // Second, First, Third
             const actualRank = positions.indexOf(index) + 1;
             const heights = ['h-24', 'h-32', 'h-20'];
-            const gradients = ['from-amber-400 to-amber-600', 'from-yellow-400 to-yellow-600', 'from-amber-400 to--600'];
+            const gradients = ['from-amber-400 to-amber-600', 'from-yellow-400 to-yellow-600', 'from-amber-400 to-stone-600'];
             
             return (
               <div key={user.id} className="flex flex-col items-center max-w-20">
