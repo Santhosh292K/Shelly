@@ -611,7 +611,7 @@ const HamburgerMenu = ({ isOpen, onClose, onNavigate, onSignOut }) => {
     { icon: Receipt, label: 'Purchase History', page: 'purchase-history' },
     { icon: HelpCircle, label: 'Help', page: 'help' },
     { icon: QrCode, label: 'Upload Bill', page: 'scanbill' },
-    { icon: Palette, label: 'Style Lab', page: 'style-lab' },
+    { icon: Palette, label: 'Style Lab', page: 'stylelab' },
     { icon: Tag, label: 'Offers', page: 'offers' },
     { icon: Gift, label: 'My Rewards', page: 'rewards' },
   ];
@@ -825,6 +825,10 @@ function WalmartMobileApp({onSignOut}) {
   const handleNavigation = (page) => {
      if (page === 'scanbill') {
       navigate('/scanbill'); // ✅ real page navigation
+      return;
+    }
+     if (page === 'stylelab') {
+      navigate('/stylelab'); // ✅ real page navigation
       return;
     }
     setCurrentPage(page);
