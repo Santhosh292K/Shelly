@@ -79,6 +79,7 @@ const ShellyAssistant = ({ isRecording }) => {
   const [chocolateVideoShown, setChocolateVideoShown] = useState(false);
   const [hasFinishedWelcome, setHasFinishedWelcome] = useState(false);
   const [currentPhase, setCurrentPhase] = useState("welcome"); 
+  const [videoKey, setVideoKey] = useState(0); // Add key for video re-rendering
 // 'welcome', 'chocolate', 'idle', 'recording'
 
   
@@ -124,20 +125,27 @@ const ShellyAssistant = ({ isRecording }) => {
 }, [currentPhase]);
 
 
-  // Handle video pattern changes
+  // Handle video pattern changes with smooth transitions
   useEffect(() => {
-    if (!isRecording && !showChocolateVideo) {
+    if (!isRecording && !showChocolateVideo && currentPhase === "idle") {
       const videoInterval = setInterval(() => {
         setVideoIndex(prevIndex => {
           const nextIndex = (prevIndex + 1) % videoPattern.length;
-          setCurrentVideo(videoPattern[nextIndex]);
+          const nextVideo = videoPattern[nextIndex];
+          
+          // Only change if it's actually different
+          if (nextVideo !== currentVideo) {
+            setCurrentVideo(nextVideo);
+            setVideoKey(prev => prev + 1); // Force re-render for smooth transition
+          }
+          
           return nextIndex;
         });
-      }, 1500);
+      }, 3000); // Increased interval for smoother experience
 
       return () => clearInterval(videoInterval);
     }
-  }, [isRecording, showChocolateVideo]);
+  }, [isRecording, showChocolateVideo, currentPhase, currentVideo]);
 
 useEffect(() => {
   // Trigger chocolate video AFTER welcome phase finishes
@@ -146,10 +154,12 @@ useEffect(() => {
       setCurrentPhase("chocolate");
       setShowChocolateVideo(true);
       setChocolateVideoShown(true); // prevent re-triggering
+      setVideoKey(prev => prev + 1); // Force re-render
 
       setTimeout(() => {
         setShowChocolateVideo(false);
         setCurrentPhase("idle");
+        setVideoKey(prev => prev + 1); // Force re-render when returning to idle
       }, 4000);
     }, 1000); // short delay after welcome ends
 
@@ -157,14 +167,20 @@ useEffect(() => {
   }
 }, [currentPhase, chocolateVideoShown]);
 
+// Handle recording state changes
+useEffect(() => {
+  if (isRecording) {
+    setVideoKey(prev => prev + 1); // Force re-render when starting recording
+  } else if (currentPhase === "idle") {
+    setVideoKey(prev => prev + 1); // Force re-render when stopping recording
+  }
+}, [isRecording, currentPhase]);
+
 useEffect(() => {
   if (currentPhase === "idle" && !isRecording) {
     setShowDialog(false);
   }
 }, [currentPhase, isRecording]);
-
-
-
 
 useEffect(() => {
   if (isRecording || showChocolateVideo) {
@@ -196,10 +212,12 @@ useEffect(() => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col justify-center items-center">
-      {/* Dialog Box - positioned above Shelly */}
+   <div className="flex flex-col items-center justify-center relative">
+
+      {/* Dialog Box - positioned above Shelly with reduced gap */}
       {showDialog && (
-  <div className="relative z-20 mb-0 transform transition-all duration-500 ease-out">
+  <div className="z-10 transform transition-all duration-500 ease-out">
+
 
           {/* Speech bubble */}
           <div className="bg-gradient-to-br from-blue-50 to-white rounded-3xl px-6 py-5 shadow-2xl border-2 border-blue-200 max-w-xs mx-auto relative animate-bounce-in">
@@ -209,7 +227,7 @@ useEffect(() => {
             {/* Message content */}
             <div className="text-center">
               <div className="flex items-center justify-center mb-0">
-                <div className={`w-3 h-3 rounded-full mr-2 shadow-lg ${
+                <div className={`w-2 h-2 rounded-full mr-2 shadow-lg ${
                   isRecording ? 'bg-red-500 animate-pulse' : 'bg-gradient-to-r from-green-400 to-green-500 animate-pulse'
                 }`}></div>
                 <span className="text-sm font-bold text-blue-600 uppercase tracking-wide">Shelly Says</span>
@@ -238,19 +256,26 @@ useEffect(() => {
         </div>
       )}
 
-      {/* Shelly Video */}
+      {/* Shelly Video with reduced gap */}
       <div 
-        className="relative cursor-pointer transform hover:scale-105 transition-transform duration-300"
+        className="relative cursor-pointer transform hover:scale-105 transition-transform duration-300 mt-2"
         onClick={handleVideoClick}
       >
         <video
-          key={isRecording ? 'listening' : showChocolateVideo ? 'chocolate' : currentVideo}
+          key={videoKey} // Force re-render for smooth transitions
           src={getVideoSource()}
           autoPlay
           loop
           muted
           playsInline
-          className="w-full h-auto scale-150 mt-12"
+          className="w-full h-auto scale-150 mt-24"
+          onLoadStart={() => {
+            // Ensure video starts playing immediately
+            const video = document.querySelector('video');
+            if (video) {
+              video.currentTime = 0;
+            }
+          }}
         />
       </div>
 
@@ -336,13 +361,13 @@ const MainPage = ({ messageText, setMessageText, isRecording, handleVoiceToggle,
       <FloatingSpheresBackground />
       
       {/* Shelly AI Assistant - positioned in center above input */}
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex-1 relative">
         <ShellyAssistant isRecording={isRecording} />
       </div>
       
       {/* Input area - moved to bottom */}
       <div className="flex justify-center items-center gap-3 p-12 bg-transparent z-10">
-        <div className="flex items-center gap-2 flex-1 bg-white bg-opacity-95 rounded-3xl p-2 shadow-lg backdrop-blur-sm border border-white border-opacity-20">
+        <div className="flex items-center gap- flex-1 bg-white bg-opacity-95 rounded-3xl p-2 shadow-lg backdrop-blur-sm border border-white border-opacity-20">
           <input
             type="text"
             value={messageText}
