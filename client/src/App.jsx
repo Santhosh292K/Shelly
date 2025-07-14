@@ -6,7 +6,7 @@ import ScanBill from './pages/ScanBillPage';
 import ScanProduct from './pages/ScanProductPage';
 import PersonalizationPage from './pages/personalization';
 import ShellyLeaderboard from './pages/leaderboard';
-
+import StyleLabPage from './pages/stylelab';
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [needsPersonalization, setNeedsPersonalization] = useState(false);
@@ -75,6 +75,7 @@ export default function App() {
             <Route path="/scanproduct" element={<ScanProduct />} />
             <Route path="/scanbill" element={<ScanBill />} />
             <Route path="/leaderboard" element={<ShellyLeaderboard />} />
+            <Route path="/stylelab" element={<StyleLabPage />} />
 
           </Routes>
         </div>
