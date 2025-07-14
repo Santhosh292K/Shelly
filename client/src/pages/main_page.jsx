@@ -12,7 +12,7 @@ import shelly_img from '../assets/shelly_img.jpg';
 import shelly_wave from '../assets/shelly_wave.webm';
 import shelly_listens from '../assets/shelly_listens.webm'
 import shelly_rotate from '../assets/shelly_rotate.webm'
-
+import shelly_chocolate from '../assets/shelly_chocolate.webm'
 
 // Shelly AI Assistant Component
 const ShellyAssistant = ({ isRecording }) => {
@@ -20,53 +20,122 @@ const ShellyAssistant = ({ isRecording }) => {
   const [currentMessage, setCurrentMessage] = useState(0);
   const [currentVideo, setCurrentVideo] = useState('wave');
   const [videoIndex, setVideoIndex] = useState(0);
+  const [showChocolateVideo, setShowChocolateVideo] = useState(false);
+  const [chocolateVideoShown, setChocolateVideoShown] = useState(false);
+  const [hasFinishedWelcome, setHasFinishedWelcome] = useState(false);
+  const [currentPhase, setCurrentPhase] = useState("welcome"); 
+// 'welcome', 'chocolate', 'idle', 'recording'
+
   
   const welcomeMessages = [
-    "Hi there! I'm Shelly, your shopping assistant!",
-    "Welcome to Walmart! How can I help you today?",
-    "Ask me anything about products, deals, or your shopping needs!"
+     "Hey there! I'm Shelly, your personal shopping assistant",
+  "Welcome to Walmart — I'm here to help you find the best products, deals, and more!",
+  "Got questions? Just ask me anything!",
+  "Oh, and by the way — your Green Score is currently 0 since you just joined.",
+  "Let's start boosting it together by making eco-friendly choices!"
   ];
   
-  // Updated to show listening message when recording
-  const displayMessage = isRecording ? "I'm listening..." : welcomeMessages[currentMessage];
+  const chocolateMessage = "I promise to behave... if you get me chocolate 😇";
   
+  // Updated to show listening message when recording, chocolate message when showing chocolate video
+const displayMessage = isRecording
+  ? "I'm listening..."
+  : showChocolateVideo
+    ? chocolateMessage
+    : currentPhase === "welcome"
+      ? welcomeMessages[currentMessage]
+      : "";
+
+
   const videoPattern = ['wave', 'wave', 'rotate'];
 
+  // Handle cycling through welcome messages every 4 seconds
+ useEffect(() => {
+  if (currentPhase === "welcome") {
+    const messageTimer = setInterval(() => {
+      setCurrentMessage((prev) => {
+        if (prev < welcomeMessages.length - 1) {
+          return prev + 1;
+        } else {
+          clearInterval(messageTimer);
+          setTimeout(() => setCurrentPhase("idle"), 2000); // ✅ End phase
+          return prev;
+        }
+      });
+    }, 4000);
+
+    return () => clearInterval(messageTimer);
+  }
+}, [currentPhase]);
+
+
+  // Handle video pattern changes
   useEffect(() => {
-    if (!isRecording) {
+    if (!isRecording && !showChocolateVideo) {
       const videoInterval = setInterval(() => {
         setVideoIndex(prevIndex => {
           const nextIndex = (prevIndex + 1) % videoPattern.length;
           setCurrentVideo(videoPattern[nextIndex]);
           return nextIndex;
         });
-      }, 2500); // Change every 8 seconds
+      }, 1500);
 
       return () => clearInterval(videoInterval);
     }
-  }, [isRecording]);
+  }, [isRecording, showChocolateVideo]);
 
-  useEffect(() => {
-    // Show dialog when recording starts
-    if (isRecording) {
-      setShowDialog(true);
-    } else {
-      // Hide dialog after 5 seconds when not recording
-      const hideTimer = setTimeout(() => {
+useEffect(() => {
+  // Trigger chocolate video AFTER welcome phase finishes
+  if (currentPhase === "idle" && !chocolateVideoShown) {
+    const chocolateTimer = setTimeout(() => {
+      setCurrentPhase("chocolate");
+      setShowChocolateVideo(true);
+      setChocolateVideoShown(true); // prevent re-triggering
+
+      setTimeout(() => {
+        setShowChocolateVideo(false);
+        setCurrentPhase("idle");
+      }, 4000);
+    }, 1000); // short delay after welcome ends
+
+    return () => clearTimeout(chocolateTimer);
+  }
+}, [currentPhase, chocolateVideoShown]);
+
+useEffect(() => {
+  if (currentPhase === "idle" && !isRecording) {
+    setShowDialog(false);
+  }
+}, [currentPhase, isRecording]);
+
+
+
+
+useEffect(() => {
+  if (isRecording || showChocolateVideo) {
+    setShowDialog(true);
+  } else {
+    const hideTimer = setTimeout(() => {
+      if (currentMessage >= welcomeMessages.length - 1) {
         setShowDialog(false);
-      }, 5000);
+      }
+    }, 2000);
 
-      return () => clearTimeout(hideTimer);
-    }
-  }, [isRecording]);
+    return () => clearTimeout(hideTimer);
+  }
+}, [isRecording, showChocolateVideo, currentMessage]);
 
   const handleVideoClick = () => {
     setShowDialog(true);
-    setCurrentMessage(0);
+   
   };
+
   const getVideoSource = () => {
     if (isRecording) {
       return shelly_listens;
+    }
+    if (showChocolateVideo) {
+      return shelly_chocolate;
     }
     return currentVideo === 'wave' ? shelly_wave : shelly_rotate;
   };
@@ -75,7 +144,8 @@ const ShellyAssistant = ({ isRecording }) => {
     <div className="w-full h-full flex flex-col justify-center items-center">
       {/* Dialog Box - positioned above Shelly */}
       {showDialog && (
-        <div className="relative mb-0 transform transition-all duration-500 ease-out">
+  <div className="relative z-20 mb-0 transform transition-all duration-500 ease-out">
+
           {/* Speech bubble */}
           <div className="bg-gradient-to-br from-blue-50 to-white rounded-3xl px-6 py-5 shadow-2xl border-2 border-blue-200 max-w-xs mx-auto relative animate-bounce-in">
             {/* Speech bubble tail pointing down */}
@@ -95,15 +165,12 @@ const ShellyAssistant = ({ isRecording }) => {
               </p>
               
               {/* Fun interactive elements */}
-              <div className="flex justify-center items-center space-x-4 mb-3">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
-                  <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
-                  <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+              
+                <div className="text-2xl animate-bounce">
+                  {isRecording ? '🎤' : showChocolateVideo ? '🍫' : '🛒'}
                 </div>
-                <div className="text-2xl animate-bounce">{isRecording ? '🎤' : '🛒'}</div>
               </div>
-            </div>
+           
             
             {/* Close button */}
             <button
@@ -122,8 +189,8 @@ const ShellyAssistant = ({ isRecording }) => {
         onClick={handleVideoClick}
       >
         <video
-          key={isRecording ? 'listening' : currentVideo} // Updated key
-          src={getVideoSource()} // Updated src
+          key={isRecording ? 'listening' : showChocolateVideo ? 'chocolate' : currentVideo}
+          src={getVideoSource()}
           autoPlay
           loop
           muted
@@ -132,12 +199,12 @@ const ShellyAssistant = ({ isRecording }) => {
         />
       </div>
 
-      {/* Floating particles around Shelly */}
+      {/* Extra floating particles around Shelly */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute w-3 h-3 bg-blue-400 rounded-full opacity-60 animate-float-1" style={{top: '10%', left: '10%'}}></div>
         <div className="absolute w-2 h-2 bg-green-400 rounded-full opacity-60 animate-float-2" style={{top: '20%', right: '15%'}}></div>
-        <div className="absolute w-4 h-4 bg-yellow-400 rounded-full opacity-60 animate-float-3" style={{bottom: '15%', left: '20%'}}></div>
-        <div className="absolute w-2 h-2 bg-purple-400 rounded-full opacity-60 animate-float-4" style={{bottom: '10%', right: '10%'}}></div>
+        <div className="absolute w-3 h-3 bg-yellow-400 rounded-full opacity-60 animate-float-3" style={{bottom: '20%', left: '20%'}}></div>
+        <div className="absolute w-2 h-2 bg-purple-400 rounded-full opacity-60 animate-float-4" style={{bottom: '20%', right: '10%'}}></div>
       </div>
 
       {/* Additional CSS for animations */}
@@ -176,7 +243,7 @@ const ShellyAssistant = ({ isRecording }) => {
         }
         
         @keyframes float-4 {
-          0%, 100% { transform: translateY(0px) translateX(0px); }
+          0%, 100% { transform: translateY(10px) translateX(0px); }
           25% { transform: translateY(10px) translateX(10px); }
           75% { transform: translateY(5px) translateX(-5px); }
         }
@@ -340,6 +407,7 @@ const FloatingSpheresBackground = () => {
   );
 };
 
+
 // Walmart Logo Component using local images
 const WalmartLogo = ({ size = 56 }) => (
   <div className=" flex items-center justify-center" style={{ width: size, height: size }}>
@@ -393,7 +461,7 @@ const TopNavigation = ({ onMenuToggle, onLogoClick, currentPage }) => {
           background: 'conic-gradient(from 0deg, #4ade80 0deg, #4ade80 140deg, transparent 140deg, transparent 220deg, #16a34a 220deg, #16a34a 360deg)'
         }}>
           <div className="w-full h-full rounded-full bg-blue-600 flex items-center justify-center relative">
-            <span className="text-white text-sm font-bold">82</span>
+            <span className="text-white text-sm font-bold">0</span>
           </div>
           <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 flex items-center justify-center">
             <Leaf size={14} color="#15803d" fill="#84cc16" />
@@ -412,8 +480,8 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
   return (
     <>
        {/* Backdrop */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center">
-        <div className="bg-white rounded-2xl p-4 mx-4 max-w-xs w-full shadow-2xl transform transition-all duration-300 ease-out">
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-[50] flex items-center justify-center">
+        <div className="bg-white rounded-2xl p-4 mb-31 mr-24 max-w-xs w-full shadow-2xl transform transition-all duration-300 ease-out">
           {/* Shelly the Tortoise */}
           <div className="flex justify-center mb-4">
             <img 
