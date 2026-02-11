@@ -47,7 +47,8 @@ The long-term vision of Shelly includes backend services, database integration, 
 ### Installation
 
 ```bash
-git clone https://github.com/your-username/shelly.git
-cd shelly
+git clone https://github.com/Santhos292K/Shelly.git
+cd Shelly
 npm install
 npm run dev
+
